@@ -8,7 +8,7 @@ export function videoPublicUrl(path: string): string {
   return publicObjectUrl(VIDEO_BUCKET, path);
 }
 
-/** Public URL for a closer's or agent's avatar (bitmoji). */
+/** Public URL for a closer's or agent's uploaded avatar. */
 export function avatarPublicUrl(path: string): string {
   return publicObjectUrl(AVATAR_BUCKET, path);
 }

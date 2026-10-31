@@ -58,7 +58,8 @@ export function CelebrationOverlay({
       ) : (
         <div className="absolute inset-0 animate-pulse bg-gradient-to-br from-indigo-700 via-fuchsia-600 to-amber-500" />
       )}
-      <div className="relative mb-[8vh] rounded-3xl bg-black/60 px-12 py-8 text-center backdrop-blur">
+      {/* Solid tint, not backdrop-blur: a blur over a playing video is redrawn every frame and stutters on TV hardware. */}
+      <div className="relative mb-[8vh] rounded-3xl bg-black/75 px-12 py-8 text-center">
         <p className="text-[8vmin] font-black leading-none text-emerald-400 tabular-nums">
           {formatUsd(celebration.amount)}
         </p>

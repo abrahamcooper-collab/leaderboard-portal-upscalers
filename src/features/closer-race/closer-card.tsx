@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { closerAvatarSrc } from "@/features/teams/avatars";
 import { TEAM_COLORS } from "@/features/teams/team-colors";
 import { formatUsd } from "@/lib/money";
 import type { RaceRunner } from "./model";
@@ -18,7 +19,12 @@ export function CloserCard({ runner }: { runner: RaceRunner }) {
       className="rounded-2xl border border-[var(--team-accent)]/70 bg-slate-900/70 p-4 shadow-[0_0_24px_-12px_var(--team-accent)]"
     >
       <header className="flex items-center gap-3 border-b border-slate-700/60 pb-3">
-        <RunnerFace name={runner.closerName} path={runner.facePath} mood={runner.mood} size={44} />
+        <RunnerFace
+          name={runner.closerName}
+          src={closerAvatarSrc(runner.teamName, runner.closerAvatarPath)}
+          mood={runner.mood}
+          size={44}
+        />
         <div className="min-w-0">
           <h3 className="truncate text-lg font-bold text-[var(--team-accent)]">{runner.closerName}</h3>
           <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
@@ -36,8 +42,9 @@ export function CloserCard({ runner }: { runner: RaceRunner }) {
       </div>
       <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-slate-800" role="progressbar" aria-valuenow={barPercent}>
         <div
-          className="h-full rounded-full bg-[var(--team-accent)] transition-[width] duration-[5s]"
-          style={{ width: `${barPercent}%` }}
+          // Scaled rather than resized, so the fill animates on the GPU without re-layout.
+          className="h-full origin-left bg-[var(--team-accent)] transition-transform duration-[5s]"
+          style={{ transform: `scaleX(${runner.progress})` }}
         />
       </div>
       <p className="mt-2 text-sm text-slate-400">

@@ -1,11 +1,10 @@
-import { AppShell, type NavLink } from "@/components/app-shell";
+import { AppShell, BOARD_LINKS, type NavLink } from "@/components/app-shell";
 import { requireAdmin } from "@/lib/auth";
 
 const ADMIN_LINKS: readonly NavLink[] = [
   { href: "/admin/sales", label: "Sales" },
   { href: "/admin/teams", label: "Teams" },
-  { href: "/sales-floor", label: "Sales Floor" },
-  { href: "/operations-closeout", label: "Operations Closeout" },
+  ...BOARD_LINKS,
 ];
 
 export default async function AdminLayout({ children }: LayoutProps<"/admin">) {

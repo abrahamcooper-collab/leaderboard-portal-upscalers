@@ -1,0 +1,6 @@
+[  300355ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:3123/design-preview?_rsc=GGbjlFrRs8TgJgU0:0
+[  300355ms] [ERROR] Failed to fetch RSC payload for http://localhost:3123/design-preview. Falling back to browser navigation. TypeError: Failed to fetch
+    at r (http://localhost:3123/_next/static/chunks/1x5qndzankywr.js:2:37087)
+    at C (http://localhost:3123/_next/static/chunks/1x5qndzankywr.js:1:32324)
+    at async E (http://localhost:3123/_next/static/chunks/1x5qndzankywr.js:1:30210)
+    at async B (http://localhost:3123/_next/static/chunks/1x5qndzankywr.js:1:23800) @ http://localhost:3123/_next/static/chunks/1x5qndzankywr.js:0

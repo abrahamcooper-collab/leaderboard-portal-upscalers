@@ -1,4 +1,4 @@
-import { AppShell, type NavLink } from "@/components/app-shell";
+import { AppShell, BOARD_LINKS, type NavLink } from "@/components/app-shell";
 import { Card, PageHeader } from "@/components/ui";
 import { CloserAgentRow } from "@/features/agents/agent-forms";
 import { toAgentRows } from "@/features/agents/agent-rows";
@@ -11,8 +11,7 @@ import { formatMonth } from "@/lib/month";
 
 const CLOSER_LINKS: readonly NavLink[] = [
   { href: "/portal", label: "My team" },
-  { href: "/sales-floor", label: "Sales Floor" },
-  { href: "/operations-closeout", label: "Operations Closeout" },
+  ...BOARD_LINKS,
 ];
 
 export default async function CloserPortalPage() {

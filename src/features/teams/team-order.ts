@@ -7,7 +7,12 @@ export function sortByTeamOrder<T>(items: readonly T[], nameOf: (item: T) => str
   return [...items].sort((a, b) => teamPosition(nameOf(a)) - teamPosition(nameOf(b)));
 }
 
+/** A team's name without the "Team" prefix, lower-cased: "Team Daniel" → "daniel". */
+export function teamKey(name: string): string {
+  return name.replace(/^team\s+/i, "").trim().toLowerCase();
+}
+
 function teamPosition(name: string): number {
-  const index = TEAM_ORDER.indexOf(name.replace(/^team\s+/i, "").trim().toLowerCase());
+  const index = TEAM_ORDER.indexOf(teamKey(name));
   return index === -1 ? TEAM_ORDER.length : index;
 }

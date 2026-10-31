@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import type { AvatarSrc } from "@/features/teams/avatars";
 import type { Mood } from "./model";
 import { RunnerFace } from "./runner-face";
 
@@ -66,17 +67,17 @@ function Arm({ far }: { far: boolean }) {
 }
 
 /**
- * A side-on runner with the closer's bitmoji as the head. Runs (limbs cycle,
+ * A side-on runner with the closer's avatar as the head. Runs (limbs cycle,
  * body bobs and leans) with a stride of `strideMs`; stands still when null.
  */
 export function RunnerFigure({
   name,
-  facePath,
+  faceSrc,
   mood,
   strideMs,
 }: {
   name: string;
-  facePath: string | null;
+  faceSrc: AvatarSrc | null;
   mood: Mood;
   strideMs: number | null;
 }) {
@@ -114,7 +115,7 @@ export function RunnerFigure({
           <Arm far={false} />
         </svg>
         <div className="absolute left-1/2 top-[3px] -translate-x-1/2">
-          <RunnerFace name={name} path={facePath} mood={mood} size={44} />
+          <RunnerFace name={name} src={faceSrc} mood={mood} size={44} />
         </div>
       </div>
     </div>

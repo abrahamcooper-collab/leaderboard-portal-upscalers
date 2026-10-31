@@ -1,0 +1,14 @@
+[     772ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3123/_next/static/chunks/1bba_next_dist_041c6vio7na_y._.js:719
+[     973ms] [LOG] [HMR] connected @ http://localhost:3123/_next/static/chunks/1bba_next_dist_041c6vio7na_y._.js:719
+[    1744ms] [WARNING] Image with src "/_next/static/media/tean-daniel-daniel-richard(closer).2dkhvlouir44f.jpeg" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio. @ http://localhost:3123/_next/static/chunks/1bba_next_dist_041c6vio7na_y._.js:719
+[    1745ms] [WARNING] Image with src "/_next/static/media/team-bill-anderson(closer).2l9hpdhgo-wya.png" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio. @ http://localhost:3123/_next/static/chunks/1bba_next_dist_041c6vio7na_y._.js:719
+[    1747ms] [WARNING] Image with src "/_next/static/media/team-mike-mike-spector(closer).1hr47r626vs3y.png" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio. @ http://localhost:3123/_next/static/chunks/1bba_next_dist_041c6vio7na_y._.js:719
+[  109801ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3123/_next/static/chunks/1bba_next_dist_041c6vio7na_y._.js:719
+[  109951ms] [LOG] [Fast Refresh] done in 43ms @ http://localhost:3123/_next/static/chunks/1bba_next_dist_041c6vio7na_y._.js:719
+[  109956ms] [LOG] [Fast Refresh] done in 43ms @ http://localhost:3123/_next/static/chunks/1bba_next_dist_041c6vio7na_y._.js:719
+[  110053ms] [LOG] [Fast Refresh] done in 43ms @ http://localhost:3123/_next/static/chunks/1bba_next_dist_041c6vio7na_y._.js:719
+[  110129ms] [LOG] [Fast Refresh] done in 43ms @ http://localhost:3123/_next/static/chunks/1bba_next_dist_041c6vio7na_y._.js:719
+[  110196ms] [LOG] [Fast Refresh] done in 43ms @ http://localhost:3123/_next/static/chunks/1bba_next_dist_041c6vio7na_y._.js:719
+[  110267ms] [LOG] [Fast Refresh] done in 43ms @ http://localhost:3123/_next/static/chunks/1bba_next_dist_041c6vio7na_y._.js:719
+[  110340ms] [LOG] [Fast Refresh] done in 43ms @ http://localhost:3123/_next/static/chunks/1bba_next_dist_041c6vio7na_y._.js:719
+[  110418ms] [LOG] [Fast Refresh] done in 43ms @ http://localhost:3123/_next/static/chunks/1bba_next_dist_041c6vio7na_y._.js:719

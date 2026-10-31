@@ -3,7 +3,6 @@
  * target, plus rank and mood. Pure, so it's shared by the page and tests.
  */
 import type { TeamStanding } from "@/features/leaderboard/model";
-import type { CloserFaces } from "@/features/teams/queries";
 import type { TeamColor } from "@/features/teams/team-colors";
 import { sortByTeamOrder } from "@/features/teams/team-order";
 
@@ -22,6 +21,7 @@ const SPRINT_TRACK_SHARE = 0.5;
 
 export type RaceRunner = {
   teamId: string;
+  teamName: string;
   closerName: string;
   color: TeamColor;
   salesTotal: number;
@@ -31,8 +31,8 @@ export type RaceRunner = {
   progress: number;
   rank: number;
   mood: Mood;
-  /** Bitmoji for the current mood, falling back to the neutral one. */
-  facePath: string | null;
+  /** The closer's uploaded avatar (storage path), if any. */
+  closerAvatarPath: string | null;
 };
 
 export type RaceSummary = {
@@ -45,20 +45,14 @@ export type RaceSummary = {
   finishedCount: number;
 };
 
-const NO_FACES: CloserFaces = { neutral: null, happy: null, sad: null };
-
-/** Runners in lane order (see team-order.ts). `facesByTeamId` supplies each closer's bitmojis. */
-export function toRaceRunners(
-  standings: readonly TeamStanding[],
-  facesByTeamId: ReadonlyMap<string, CloserFaces>,
-): RaceRunner[] {
+/** Runners in lane order (see team-order.ts). */
+export function toRaceRunners(standings: readonly TeamStanding[]): RaceRunner[] {
   const totals = standings.map((team) => team.salesTotal);
 
   return sortByTeamOrder(standings, (team) => team.name).map((team) => {
-    const mood = moodFor(team.salesTotal, totals);
-    const faces = facesByTeamId.get(team.id) ?? NO_FACES;
     return {
       teamId: team.id,
+      teamName: team.name,
       closerName: team.closerName,
       color: team.color,
       salesTotal: team.salesTotal,
@@ -66,8 +60,8 @@ export function toRaceRunners(
       target: team.target,
       progress: team.target > 0 ? Math.min(team.salesTotal / team.target, 1) : 0,
       rank: 1 + totals.filter((total) => total > team.salesTotal).length,
-      mood,
-      facePath: faces[mood] ?? faces.neutral,
+      mood: moodFor(team.salesTotal, totals),
+      closerAvatarPath: team.closerAvatarPath,
     };
   });
 }

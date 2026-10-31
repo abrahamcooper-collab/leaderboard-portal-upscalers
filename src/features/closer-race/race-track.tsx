@@ -1,4 +1,7 @@
+"use client";
+
 import type { CSSProperties } from "react";
+import { closerAvatarSrc } from "@/features/teams/avatars";
 import { TEAM_COLORS } from "@/features/teams/team-colors";
 import { formatUsd } from "@/lib/money";
 import type { RaceRunner, RecentSale } from "./model";
@@ -8,9 +11,9 @@ import { useRunnerMotion, MOTION_TICK_MS } from "./use-runner-motion";
 const RUNNER_WIDTH_PX = 96;
 const QUARTERS = [0, 0.25, 0.5, 0.75, 1];
 // While running, each tick glides linearly into the next, so motion is continuous.
-const RUNNING_TRANSITION = `left ${MOTION_TICK_MS}ms linear`;
+const RUNNING_TRANSITION = `transform ${MOTION_TICK_MS}ms linear`;
 // Any other jump (e.g. a deleted sale) settles quickly.
-const SETTLE_TRANSITION = "left 1s ease-out";
+const SETTLE_TRANSITION = "transform 1s ease-out";
 const NO_RECENT_SALES: readonly RecentSale[] = [];
 
 function axisLabel(fraction: number, perCloserTarget: number | null): string {
@@ -95,29 +98,39 @@ function Lane({
   const style = { "--team-accent": accent, "--team-on-accent": onAccent } as CSSProperties;
 
   return (
-    <div style={style} className={`relative h-[11.5rem] ${isLast ? "" : "border-b border-slate-600/40"}`}>
+    <div style={style} className={`relative h-[clamp(10.5rem,16.5vh,11.5rem)] ${isLast ? "" : "border-b border-slate-600/40"}`}>
       <div className="absolute inset-y-0 left-6 right-12">
+        {/* The carrier spans the runner's whole travel, so translating it by `progress` of its own
+            width puts the runner in place. A transform (not `left`) keeps the glide on the GPU,
+            with no layout work per frame. */}
         <div
-          className="absolute bottom-1.5 flex flex-col items-center"
+          className="absolute inset-y-0 left-0 will-change-transform"
           // Position depends on the clock, so server and browser render it a moment apart.
           suppressHydrationWarning
           style={{
-            width: RUNNER_WIDTH_PX,
-            left: `calc(${progress} * (100% - ${RUNNER_WIDTH_PX}px))`,
+            width: `calc(100% - ${RUNNER_WIDTH_PX}px)`,
+            transform: `translateX(${progress * 100}%)`,
             transition: strideMs !== null ? RUNNING_TRANSITION : SETTLE_TRANSITION,
           }}
         >
-          {/* Counts up with the runner's distance; the cards below show the real total straight away. */}
-          <span
-            suppressHydrationWarning
-            className="mb-1 rounded-lg border-2 border-[var(--team-accent)] bg-slate-950 px-2 py-0.5 text-sm font-extrabold tabular-nums text-white shadow-[0_0_14px_-2px_var(--team-accent)]"
-          >
-            {formatUsd(covered)}
-          </span>
-          <RunnerFigure name={runner.closerName} facePath={runner.facePath} mood={runner.mood} strideMs={strideMs} />
-          <span className="mt-1 rounded-md bg-[var(--team-accent)] px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-wide text-[var(--team-on-accent)]">
-            {runner.closerName.split(" ")[0]}
-          </span>
+          <div className="absolute bottom-1.5 left-0 flex flex-col items-center" style={{ width: RUNNER_WIDTH_PX }}>
+            {/* Counts up with the runner's distance; the cards below show the real total straight away. */}
+            <span
+              suppressHydrationWarning
+              className="mb-1 rounded-lg border-2 border-[var(--team-accent)] bg-slate-950 px-2 py-0.5 text-sm font-extrabold tabular-nums text-white shadow-[0_0_14px_-2px_var(--team-accent)]"
+            >
+              {formatUsd(covered)}
+            </span>
+            <RunnerFigure
+              name={runner.closerName}
+              faceSrc={closerAvatarSrc(runner.teamName, runner.closerAvatarPath)}
+              mood={runner.mood}
+              strideMs={strideMs}
+            />
+            <span className="mt-1 rounded-md bg-[var(--team-accent)] px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-wide text-[var(--team-on-accent)]">
+              {runner.closerName.split(" ")[0]}
+            </span>
+          </div>
         </div>
       </div>
     </div>

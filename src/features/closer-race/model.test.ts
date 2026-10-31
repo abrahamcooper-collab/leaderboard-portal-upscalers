@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import type { TeamStanding } from "@/features/leaderboard/model";
-import type { CloserFaces } from "@/features/teams/queries";
 import { RUN_AFTER_SALE_MS, coveredAt, moodFor, runEndsAt, strideMsAt, summarizeRace, toRaceRunners, trackProgress } from "./model";
 
 const team = (id: string, name: string, salesTotal: number, target = 10_000): TeamStanding => ({
@@ -35,7 +34,7 @@ describe("toRaceRunners", () => {
   const standings = [team("m", "Mike", 3700), team("b", "Bill", 2500), team("d", "Team Daniel", 1000)];
 
   it("orders lanes by team order and ranks by sales", () => {
-    const runners = toRaceRunners(standings, new Map());
+    const runners = toRaceRunners(standings);
     expect(runners.map((runner) => [runner.teamId, runner.rank])).toEqual([
       ["d", 3],
       ["b", 2],
@@ -44,27 +43,16 @@ describe("toRaceRunners", () => {
   });
 
   it("caps progress at the finish line and handles a missing target", () => {
-    const [over, none] = toRaceRunners([team("d", "Daniel", 15_000), team("b", "Bill", 500, 0)], new Map());
+    const [over, none] = toRaceRunners([team("d", "Daniel", 15_000), team("b", "Bill", 500, 0)]);
     expect(over.progress).toBe(1);
     expect(none.progress).toBe(0);
-  });
-
-  it("picks the bitmoji for the mood, falling back to neutral", () => {
-    const faces = new Map<string, CloserFaces>([
-      ["m", { neutral: "m/neutral.png", happy: "m/happy.png", sad: null }],
-      ["d", { neutral: "d/neutral.png", happy: null, sad: null }],
-    ]);
-    const runners = toRaceRunners(standings, faces);
-    expect(runners.find((runner) => runner.teamId === "m")?.facePath).toBe("m/happy.png");
-    expect(runners.find((runner) => runner.teamId === "d")?.facePath).toBe("d/neutral.png");
-    expect(runners.find((runner) => runner.teamId === "b")?.facePath).toBeNull();
   });
 });
 
 describe("summarizeRace", () => {
   it("totals targets and sales and names a clear leader", () => {
     const summary = summarizeRace(
-      toRaceRunners([team("d", "Daniel", 1000), team("b", "Bill", 2500), team("m", "Mike", 10_000)], new Map()),
+      toRaceRunners([team("d", "Daniel", 1000), team("b", "Bill", 2500), team("m", "Mike", 10_000)]),
     );
     expect(summary).toEqual({
       teamTarget: 30_000,
@@ -76,10 +64,10 @@ describe("summarizeRace", () => {
   });
 
   it("has no leader on a tie or before any sales, and no per-closer target when they differ", () => {
-    const tied = summarizeRace(toRaceRunners([team("d", "Daniel", 500), team("b", "Bill", 500, 8000)], new Map()));
+    const tied = summarizeRace(toRaceRunners([team("d", "Daniel", 500), team("b", "Bill", 500, 8000)]));
     expect(tied.leaderName).toBeNull();
     expect(tied.perCloserTarget).toBeNull();
-    expect(summarizeRace(toRaceRunners([team("d", "Daniel", 0)], new Map())).leaderName).toBeNull();
+    expect(summarizeRace(toRaceRunners([team("d", "Daniel", 0)])).leaderName).toBeNull();
   });
 });
 

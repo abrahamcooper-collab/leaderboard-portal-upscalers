@@ -1,35 +1,32 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useState, type ReactNode } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { SalesFloorView } from "@/features/sales-floor/sales-floor-view";
 import type { Database } from "@/lib/supabase/database.types";
 import { videoPublicUrl } from "@/lib/supabase/storage";
 import { CelebrationOverlay, type Celebration } from "./celebration-overlay";
-import type { TeamStanding } from "./model";
 import { useLiveSales, type SaleRow } from "./use-live-sales";
 import { usePreloadedVideos } from "./use-preloaded-videos";
 
 /**
- * The Sales Floor, kept live: every sale insert queues a full-screen
- * celebration and re-fetches the standings from the server. `videoUrls` are
- * all teams' celebration videos, downloaded up front so they play instantly.
+ * Keeps a TV board live (the Sales Floor, or the slideshow): every sale insert
+ * queues a full-screen celebration and re-fetches the page's data from the
+ * server. `videoUrls` are all teams' celebration videos, downloaded up front
+ * so they play instantly.
  */
 export function LiveBoard({
-  standings,
-  monthLabel,
   videoUrls,
+  children,
 }: {
-  standings: readonly TeamStanding[];
-  monthLabel: string;
   videoUrls: readonly string[];
+  children: ReactNode;
 }) {
   const preloadedVideos = usePreloadedVideos(videoUrls);
   const [queue, setQueue] = useState<Celebration[]>([]);
   // Browsers only allow video with sound after someone interacts with the page.
   const [soundOn, setSoundOn] = useState(false);
 
-  useLiveSales("sales-floor", (supabase, sale) => {
+  useLiveSales("live-board", (supabase, sale) => {
     loadCelebration(supabase, sale).then((celebration) => {
       if (celebration) setQueue((current) => [...current, celebration]);
     });
@@ -40,7 +37,7 @@ export function LiveBoard({
 
   return (
     <>
-      <SalesFloorView standings={standings} monthLabel={monthLabel} />
+      {children}
       {current && (
         <CelebrationOverlay
           key={current.key}
@@ -50,7 +47,7 @@ export function LiveBoard({
           onDone={finishCurrent}
         />
       )}
-      <div className="fixed bottom-4 right-4 flex gap-2">
+      <div className="fixed bottom-4 right-4 z-40 flex gap-2">
         {!soundOn && (
           <BoardButton onClick={() => setSoundOn(true)}>Enable sound</BoardButton>
         )}
@@ -66,7 +63,7 @@ function BoardButton({ onClick, children }: { onClick: () => void; children: str
   return (
     <button
       onClick={onClick}
-      className="rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur hover:bg-white/20"
+      className="rounded-full bg-black/50 px-4 py-2 text-sm font-medium text-white ring-1 ring-white/15 hover:bg-black/70"
     >
       {children}
     </button>

@@ -6,7 +6,11 @@ celebration video whenever an admin records a sale.
 - **Admins** manage closers, teams, agents, monthly targets and videos, and record sales.
 - **Closers** see their team's stats and can rename agents or change their phone numbers.
 - **The Sales Floor** (`/sales-floor`) is built for a TV. It updates live and celebrates each new sale.
-- **Operations Closeout** (`/operations-closeout`) is the closer race: each closer runs toward their team target, with a happy, neutral or sad bitmoji by position. After a team's sale, its runner runs for 10 minutes and covers the new distance in exactly that time.
+- **Operations Closeout** (`/operations-closeout`) is the closer race: each closer runs toward their team target, with their photo as the runner's face. After a team's sale, its runner runs for 10 minutes and covers the new distance in exactly that time.
+- **Page 3** (`/page-3`) is one full-screen picture, from `public/images/Page3/`.
+- **Page 4** (`/page-4`) is one of two full-screen pictures from `public/images/page4/`, the other one on each visit.
+- **Slideshow** (`/slideshow`, the ▶ Slideshow button in the header) loops Sales Floor → Operations Closeout → Page 3 → Page 4 with a slow cross-fade. It stays live: sales update the numbers and play their celebration over whatever is showing. Slide times are at the top of `src/app/slideshow/page.tsx`.
+- **Photos** of closers and agents come from `public/images/team*/`. A closer's photo is matched by team, an agent's by team and name. The list is in `src/features/teams/roster-photos.ts`.
 
 Stack: Next.js 16 (App Router, Server Actions), Tailwind CSS v4, Supabase (Postgres, Auth, Realtime, Storage), deployed on Vercel.
 
@@ -75,11 +79,13 @@ Open http://localhost:3000 and sign in as the admin.
 2. Add the four variables from `.env.local` under **Settings → Environment Variables**.
 3. Deploy.
 
+`vercel.json` runs the server code in Frankfurt (`fra1`), next to the Supabase database (AWS `eu-central-1`). Every page makes several database calls in a row, so keep the two in the same region: if the database ever moves, change `regions` to match.
+
 The Hobby plan is for non-commercial use only, so use Vercel Pro for the real thing. Supabase's free plan has no backups; move to Pro before the sales data matters.
 
 ## Setting up the TV
 
-1. Sign in on the TV's browser (any admin or closer account) and open `/sales-floor`.
+1. Sign in on the TV's browser (any admin or closer account) and click **▶ Slideshow** (or open `/sales-floor` for the leaderboard alone).
 2. Click **Enable sound**. Browsers block video sound until someone clicks the page once.
 3. Click **Full screen**.
 

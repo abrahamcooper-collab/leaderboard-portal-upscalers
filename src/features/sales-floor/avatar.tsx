@@ -1,31 +1,32 @@
 import Image from "next/image";
-import { avatarPublicUrl } from "@/lib/supabase/storage";
+import type { AvatarSrc } from "@/features/teams/avatars";
 
 /**
- * A person's bitmoji in a circle, or their initials until one is uploaded.
+ * A person's avatar in a circle, or their initials when they have none.
  * The ring takes the team colour from the surrounding `--team-accent`.
  */
 export function Avatar({
   name,
-  path,
+  src,
   size,
 }: {
   name: string;
-  path: string | null;
+  src: AvatarSrc | null;
   size: number;
 }) {
   const style = { width: size, height: size };
   const ring = "shrink-0 rounded-full ring-2 ring-[var(--team-accent)]";
 
-  if (path) {
+  if (src) {
     return (
       <Image
-        src={avatarPublicUrl(path)}
+        src={src}
         alt={name}
         width={size}
         height={size}
-        // Bitmojis are small and come straight from Supabase Storage's CDN.
-        unoptimized
+        // Uploaded avatars are small and come straight from Supabase Storage's CDN;
+        // bundled team photos are large, so Next.js serves resized copies.
+        unoptimized={typeof src === "string"}
         className={`${ring} bg-black object-cover`}
         style={style}
       />

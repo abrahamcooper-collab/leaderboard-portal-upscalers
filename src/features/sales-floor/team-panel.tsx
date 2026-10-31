@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { targetProgress, type AgentStanding, type TeamStanding } from "@/features/leaderboard/model";
+import { agentAvatarSrc, closerAvatarSrc } from "@/features/teams/avatars";
 import { TEAM_COLORS } from "@/features/teams/team-colors";
 import { Avatar } from "./avatar";
 import { Crown } from "./crown";
@@ -44,7 +45,7 @@ export function TeamPanel({ team, rowCount }: { team: TeamStanding; rowCount: nu
       className="flex min-h-0 flex-col border-2 border-[var(--team-accent)] bg-black/60 shadow-[0_0_28px_-6px_var(--team-accent)]"
     >
       <header className="flex items-center gap-4 px-5 py-3">
-        <Avatar name={team.closerName} path={team.closerAvatarPath} size={56} />
+        <Avatar name={team.closerName} src={closerAvatarSrc(team.name, team.closerAvatarPath)} size={56} />
         <h2 className="flex min-w-0 items-baseline gap-3 font-[family-name:var(--font-marker)] text-[clamp(1.5rem,min(2.3vw,4vh),2.6rem)] uppercase leading-none">
           <span className="text-white">Team</span>
           <span className="truncate text-[var(--team-accent)]">{displayTeamName(team.name)}</span>
@@ -69,7 +70,7 @@ export function TeamPanel({ team, rowCount }: { team: TeamStanding; rowCount: nu
         </thead>
         <tbody className={`font-[family-name:var(--font-chalk)] text-white ${ROW_TEXT}`}>
           {team.agents.map((agent) => (
-            <AgentRow key={agent.id} agent={agent} />
+            <AgentRow key={agent.id} agent={agent} teamName={team.name} />
           ))}
           {Array.from({ length: emptyRows }, (_, index) => (
             <tr key={`empty-${index}`} className="border-t border-[var(--team-line)]">
@@ -96,14 +97,14 @@ export function TeamPanel({ team, rowCount }: { team: TeamStanding; rowCount: nu
   );
 }
 
-function AgentRow({ agent }: { agent: AgentStanding }) {
+function AgentRow({ agent, teamName }: { agent: AgentStanding; teamName: string }) {
   const hitTarget = targetProgress(agent.salesTotal, agent.target) === 1;
 
   return (
     <tr className={`border-t border-[var(--team-line)] ${agent.archived ? "opacity-45" : ""}`}>
       <td className={CELL}>
         <span className="flex min-w-0 items-center gap-2.5">
-          <Avatar name={agent.name} path={agent.avatarPath} size={28} />
+          <Avatar name={agent.name} src={agentAvatarSrc(teamName, agent.name, agent.avatarPath)} size={28} />
           <span className="truncate uppercase">{agent.name}</span>
           {agent.archived && <span className="shrink-0 text-[0.65em] normal-case text-white/60">(removed)</span>}
         </span>
