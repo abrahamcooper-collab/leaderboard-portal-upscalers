@@ -40,7 +40,7 @@ body {
   animation-delay: calc(var(--stride) / -2);
 }
 .runner.is-running .runner-speed-line {
-  animation: runner-speed-line 0.5s linear infinite;
+  animation: runner-speed-line var(--stride) linear infinite;
 }
 
 /* Forward swing is negative: the runner faces right. */

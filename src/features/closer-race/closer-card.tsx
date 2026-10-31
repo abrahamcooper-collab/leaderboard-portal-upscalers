@@ -7,7 +7,9 @@ import { RunnerFace } from "./runner-face";
 /** A closer's stats under the track: rank, sales, and progress to their target. */
 export function CloserCard({ runner }: { runner: RaceRunner }) {
   const { accent } = TEAM_COLORS[runner.color];
-  const percent = Math.round(runner.progress * 100);
+  // Real share of target (can pass 100%); the bar and runner stop at the finish line.
+  const percentOfTarget = runner.target > 0 ? Math.round((runner.salesTotal / runner.target) * 100) : 0;
+  const barPercent = Math.round(runner.progress * 100);
   const isLeader = runner.rank === 1 && runner.salesTotal > 0;
 
   return (
@@ -29,13 +31,13 @@ export function CloserCard({ runner }: { runner: RaceRunner }) {
       <div className="mt-3 flex items-baseline justify-between">
         <p className="text-3xl font-extrabold tabular-nums text-white">{formatUsd(runner.salesTotal)}</p>
         <p className="text-lg font-extrabold tabular-nums text-[var(--team-accent)]">
-          {runner.target > 0 ? `${percent}%` : "No target"}
+          {runner.target > 0 ? `${percentOfTarget}%` : "No target"}
         </p>
       </div>
-      <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-slate-800" role="progressbar" aria-valuenow={percent}>
+      <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-slate-800" role="progressbar" aria-valuenow={barPercent}>
         <div
           className="h-full rounded-full bg-[var(--team-accent)] transition-[width] duration-[5s]"
-          style={{ width: `${percent}%` }}
+          style={{ width: `${barPercent}%` }}
         />
       </div>
       <p className="mt-2 text-sm text-slate-400">

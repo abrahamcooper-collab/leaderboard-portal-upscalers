@@ -1,20 +1,29 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { runEndsAt, trackProgressAt, type RaceRunner, type RecentSale } from "./model";
+import { coveredAt, runEndsAt, strideMsAt, trackProgress, type RaceRunner, type RecentSale } from "./model";
 
 /** How often a running runner's position is recalculated. */
 export const MOTION_TICK_MS = 1_000;
 
+export type RunnerMotion = {
+  /** Dollars covered so far; reaches the real total when the run ends. */
+  covered: number;
+  /** 0–1 position on the track. */
+  progress: number;
+  /** Run-cycle length in ms, or null when standing still. */
+  strideMs: number | null;
+};
+
 /**
- * A runner's live track position and whether it's running. While a recent
- * sale's run is in progress the position advances every tick, reaching the
- * final spot exactly when the run (and the running animation) ends.
+ * A runner's live motion. While a recent sale's run is in progress the
+ * position advances every tick, reaching the final spot exactly when the run
+ * (and the running animation) ends; the stride quickens for bigger sales.
  */
 export function useRunnerMotion(
   runner: Pick<RaceRunner, "salesTotal" | "target">,
   recentSales: readonly RecentSale[],
-): { progress: number; isRunning: boolean } {
+): RunnerMotion {
   const endsAt = runEndsAt(recentSales);
   const [now, setNow] = useState(() => Date.now());
 
@@ -28,8 +37,10 @@ export function useRunnerMotion(
     return () => clearInterval(interval);
   }, [endsAt]);
 
+  const covered = coveredAt({ salesTotal: runner.salesTotal, recentSales, now });
   return {
-    progress: trackProgressAt({ salesTotal: runner.salesTotal, target: runner.target, recentSales, now }),
-    isRunning: now < endsAt,
+    covered,
+    progress: trackProgress(covered, runner.target),
+    strideMs: strideMsAt(runner.target, recentSales, now),
   };
 }

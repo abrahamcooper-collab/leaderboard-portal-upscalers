@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { TeamStanding } from "@/features/leaderboard/model";
 import type { CloserFaces } from "@/features/teams/queries";
-import { RUN_AFTER_SALE_MS, moodFor, runEndsAt, summarizeRace, toRaceRunners, trackProgressAt } from "./model";
+import { RUN_AFTER_SALE_MS, coveredAt, moodFor, runEndsAt, strideMsAt, summarizeRace, toRaceRunners, trackProgress } from "./model";
 
 const team = (id: string, name: string, salesTotal: number, target = 10_000): TeamStanding => ({
   id,
@@ -83,11 +83,19 @@ describe("summarizeRace", () => {
   });
 });
 
-describe("trackProgressAt", () => {
-  const saleAt = Date.parse("2026-10-31T12:00:00Z");
-  const sale = (offsetMs: number, amount: number) => ({ soldAt: new Date(saleAt + offsetMs).toISOString(), amount });
+const saleAt = Date.parse("2026-10-31T12:00:00Z");
+const sale = (offsetMs: number, amount: number) => ({ soldAt: new Date(saleAt + offsetMs).toISOString(), amount });
+
+describe("coveredAt + trackProgress", () => {
   const at = (offsetMs: number, recentSales = [sale(0, 1000)], salesTotal = 3000) =>
-    trackProgressAt({ salesTotal, target: 10_000, recentSales, now: saleAt + offsetMs });
+    trackProgress(coveredAt({ salesTotal, recentSales, now: saleAt + offsetMs }), 10_000);
+
+  it("covers the sale's dollars evenly, reaching the real total when the run ends", () => {
+    const covered = (offsetMs: number) => coveredAt({ salesTotal: 3000, recentSales: [sale(0, 1000)], now: saleAt + offsetMs });
+    expect(covered(0)).toBe(2000);
+    expect(covered(RUN_AFTER_SALE_MS / 4)).toBe(2250);
+    expect(covered(RUN_AFTER_SALE_MS)).toBe(3000);
+  });
 
   it("starts where the runner was before the sale and arrives exactly when the run ends", () => {
     expect(at(0)).toBeCloseTo(0.2);
@@ -107,10 +115,34 @@ describe("trackProgressAt", () => {
   it("never goes below the start, past the real total, or past the finish line", () => {
     expect(at(0, [sale(0, 5000)], 3000)).toBe(0);
     expect(at(RUN_AFTER_SALE_MS, [sale(0, 1000)], 30_000)).toBe(1);
-    expect(trackProgressAt({ salesTotal: 500, target: 0, recentSales: [], now: saleAt })).toBe(0);
+    expect(trackProgress(500, 0)).toBe(0);
   });
 
   it("has no run end without recent sales", () => {
     expect(runEndsAt([])).toBe(0);
+  });
+});
+
+describe("strideMsAt", () => {
+  it("is null when no run is in progress", () => {
+    expect(strideMsAt(10_000, [], saleAt)).toBeNull();
+    expect(strideMsAt(10_000, [sale(0, 1000)], saleAt + RUN_AFTER_SALE_MS + 1)).toBeNull();
+  });
+
+  it("strides faster for bigger sales, sprinting at half the track per run", () => {
+    const small = strideMsAt(10_000, [sale(0, 200)], saleAt + 1000)!;
+    const medium = strideMsAt(10_000, [sale(0, 1000)], saleAt + 1000)!;
+    const big = strideMsAt(10_000, [sale(0, 5000)], saleAt + 1000)!;
+    expect(small).toBeGreaterThan(medium);
+    expect(medium).toBeGreaterThan(big);
+    expect(big).toBe(350);
+    expect(strideMsAt(10_000, [sale(0, 50_000)], saleAt + 1000)).toBe(350);
+  });
+
+  it("speeds up while two sales overlap, then slows when the first finishes", () => {
+    const sales = [sale(0, 1000), sale(RUN_AFTER_SALE_MS / 2, 1000)];
+    const bothActive = strideMsAt(10_000, sales, saleAt + RUN_AFTER_SALE_MS * 0.75)!;
+    const secondOnly = strideMsAt(10_000, sales, saleAt + RUN_AFTER_SALE_MS * 1.25)!;
+    expect(bothActive).toBeLessThan(secondOnly);
   });
 });

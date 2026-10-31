@@ -67,23 +67,24 @@ function Arm({ far }: { far: boolean }) {
 
 /**
  * A side-on runner with the closer's bitmoji as the head. Runs (limbs cycle,
- * body bobs and leans) while `isRunning`; otherwise stands still.
+ * body bobs and leans) with a stride of `strideMs`; stands still when null.
  */
 export function RunnerFigure({
   name,
   facePath,
   mood,
-  isRunning,
+  strideMs,
 }: {
   name: string;
   facePath: string | null;
   mood: Mood;
-  isRunning: boolean;
+  strideMs: number | null;
 }) {
+  const isRunning = strideMs !== null;
   return (
     <div
       className={`runner relative h-[116px] w-[64px] ${isRunning ? "is-running" : ""}`}
-      style={{ "--stride": "0.62s" } as CSSProperties}
+      style={{ "--stride": `${strideMs ?? 0}ms` } as CSSProperties}
     >
       {isRunning && (
         <div aria-hidden className="absolute -left-5 top-[62px] flex flex-col gap-2">
@@ -91,7 +92,7 @@ export function RunnerFigure({
             <span
               key={line}
               className="runner-speed-line block h-0.5 w-5 rounded-full bg-[var(--team-accent)]"
-              style={{ animationDelay: `${line * -0.17}s`, marginLeft: line * 4 }}
+              style={{ animationDelay: `calc(var(--stride) * ${-line / 3})`, marginLeft: line * 4 }}
             />
           ))}
         </div>

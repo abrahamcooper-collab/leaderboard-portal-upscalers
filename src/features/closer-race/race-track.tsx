@@ -90,7 +90,7 @@ function Lane({
   isLast: boolean;
   recentSales: readonly RecentSale[];
 }) {
-  const { progress, isRunning } = useRunnerMotion(runner, recentSales);
+  const { covered, progress, strideMs } = useRunnerMotion(runner, recentSales);
   const { accent, onAccent } = TEAM_COLORS[runner.color];
   const style = { "--team-accent": accent, "--team-on-accent": onAccent } as CSSProperties;
 
@@ -104,13 +104,17 @@ function Lane({
           style={{
             width: RUNNER_WIDTH_PX,
             left: `calc(${progress} * (100% - ${RUNNER_WIDTH_PX}px))`,
-            transition: isRunning ? RUNNING_TRANSITION : SETTLE_TRANSITION,
+            transition: strideMs !== null ? RUNNING_TRANSITION : SETTLE_TRANSITION,
           }}
         >
-          <span className="mb-1 rounded-lg border-2 border-[var(--team-accent)] bg-slate-950 px-2 py-0.5 text-sm font-extrabold tabular-nums text-white shadow-[0_0_14px_-2px_var(--team-accent)]">
-            {formatUsd(runner.salesTotal)}
+          {/* Counts up with the runner's distance; the cards below show the real total straight away. */}
+          <span
+            suppressHydrationWarning
+            className="mb-1 rounded-lg border-2 border-[var(--team-accent)] bg-slate-950 px-2 py-0.5 text-sm font-extrabold tabular-nums text-white shadow-[0_0_14px_-2px_var(--team-accent)]"
+          >
+            {formatUsd(covered)}
           </span>
-          <RunnerFigure name={runner.closerName} facePath={runner.facePath} mood={runner.mood} isRunning={isRunning} />
+          <RunnerFigure name={runner.closerName} facePath={runner.facePath} mood={runner.mood} strideMs={strideMs} />
           <span className="mt-1 rounded-md bg-[var(--team-accent)] px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-wide text-[var(--team-on-accent)]">
             {runner.closerName.split(" ")[0]}
           </span>
