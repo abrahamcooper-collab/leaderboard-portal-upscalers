@@ -9,11 +9,13 @@ import { revalidateApp } from "@/lib/revalidate";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { VIDEO_BUCKET } from "@/lib/supabase/storage";
+import { TEAM_COLOR_IDS } from "./team-colors";
 
 const closerDetails = {
   fullName: field.name("Closer name"),
   phone: field.phone,
   teamName: field.name("Team name"),
+  color: z.enum(TEAM_COLOR_IDS, { message: "Choose a team colour." }),
 };
 
 const createCloserSchema = z.object({
@@ -27,7 +29,7 @@ export async function createCloser(_state: ActionState, formData: FormData): Pro
   await requireAdmin();
   const parsed = createCloserSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return invalid(parsed.error);
-  const { email, password, fullName, phone, teamName } = parsed.data;
+  const { email, password, fullName, phone, teamName, color } = parsed.data;
 
   const admin = createAdminClient();
   const { data: created, error: authError } = await admin.auth.admin.createUser({
@@ -46,6 +48,7 @@ export async function createCloser(_state: ActionState, formData: FormData): Pro
     p_full_name: fullName,
     p_phone: phone,
     p_team_name: teamName,
+    p_color: color,
   });
   if (error) {
     // Don't leave a login behind that has no profile or team.
@@ -63,7 +66,7 @@ export async function updateCloser(_state: ActionState, formData: FormData): Pro
   await requireAdmin();
   const parsed = updateCloserSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return invalid(parsed.error);
-  const { teamId, fullName, phone, teamName } = parsed.data;
+  const { teamId, fullName, phone, teamName, color } = parsed.data;
 
   const supabase = await createClient();
   const { error } = await supabase.rpc("update_closer", {
@@ -71,6 +74,7 @@ export async function updateCloser(_state: ActionState, formData: FormData): Pro
     p_full_name: fullName,
     p_phone: phone,
     p_team_name: teamName,
+    p_color: color,
   });
   if (error) return unexpected(`updateCloser ${teamId}`, error);
 

@@ -1,7 +1,8 @@
 import { ActionForm } from "@/components/action-form";
-import { Field, Input } from "@/components/ui";
+import { Field, Input, Select } from "@/components/ui";
 import { createCloser, removeCloser, resetCloserPassword, updateCloser } from "./actions";
 import type { TeamDetail } from "./queries";
+import { TEAM_COLORS, TEAM_COLOR_IDS } from "./team-colors";
 
 function CloserFields({ team }: { team?: TeamDetail }) {
   return (
@@ -14,6 +15,15 @@ function CloserFields({ team }: { team?: TeamDetail }) {
       </Field>
       <Field label="Team name">
         <Input name="teamName" defaultValue={team?.name} required maxLength={80} />
+      </Field>
+      <Field label="Sales Floor colour">
+        <Select name="color" defaultValue={team?.color ?? "gray"} required>
+          {TEAM_COLOR_IDS.map((id) => (
+            <option key={id} value={id}>
+              {TEAM_COLORS[id].label}
+            </option>
+          ))}
+        </Select>
       </Field>
     </>
   );
@@ -35,7 +45,7 @@ export function CreateCloserForm() {
 
 export function EditCloserForm({ team }: { team: TeamDetail }) {
   return (
-    <ActionForm action={updateCloser} submitLabel="Save" className="grid gap-4 sm:grid-cols-3">
+    <ActionForm action={updateCloser} submitLabel="Save" className="grid gap-4 sm:grid-cols-2">
       <input type="hidden" name="teamId" value={team.id} />
       <CloserFields team={team} />
     </ActionForm>

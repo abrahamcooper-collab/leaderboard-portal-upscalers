@@ -9,3 +9,66 @@ body {
   background: var(--color-slate-50);
   color: var(--color-slate-900);
 }
+
+/* ---------------------------------------------------------------------------
+ * Closer race runner: a run cycle for the jointed SVG in runner-figure.tsx.
+ * One stride is --stride long; the far-side limbs run half a stride behind.
+ * Without .is-running the figure stands still. Deliberately not disabled by
+ * prefers-reduced-motion: this is a wall display and the run is the feature.
+ * ------------------------------------------------------------------------- */
+
+.runner-limb {
+  transform-box: view-box;
+}
+
+.runner.is-running .runner-bob {
+  animation: runner-bob calc(var(--stride) / 2) ease-in-out infinite;
+}
+.runner.is-running .runner-thigh {
+  animation: runner-thigh var(--stride) ease-in-out infinite;
+}
+.runner.is-running .runner-shin {
+  animation: runner-shin var(--stride) linear infinite;
+}
+.runner.is-running .runner-upper-arm {
+  animation: runner-arm var(--stride) ease-in-out infinite;
+}
+.runner.is-running .runner-far {
+  animation-delay: calc(var(--stride) / -2);
+}
+.runner.is-running .runner-far * {
+  animation-delay: calc(var(--stride) / -2);
+}
+.runner.is-running .runner-speed-line {
+  animation: runner-speed-line 0.5s linear infinite;
+}
+
+/* Forward swing is negative: the runner faces right. */
+@keyframes runner-thigh {
+  0%, 100% { transform: rotate(-38deg); }
+  50% { transform: rotate(32deg); }
+}
+
+/* Knee: nearly straight at foot strike, folds high as the leg recovers. */
+@keyframes runner-shin {
+  0%, 100% { transform: rotate(6deg); }
+  40% { transform: rotate(18deg); }
+  55% { transform: rotate(70deg); }
+  70% { transform: rotate(110deg); }
+  85% { transform: rotate(50deg); }
+}
+
+@keyframes runner-arm {
+  0%, 100% { transform: rotate(42deg); }
+  50% { transform: rotate(-42deg); }
+}
+
+@keyframes runner-bob {
+  0%, 100% { transform: translateY(0) rotate(8deg); }
+  50% { transform: translateY(-4px) rotate(8deg); }
+}
+
+@keyframes runner-speed-line {
+  from { transform: translateX(0); opacity: 0.7; }
+  to { transform: translateX(-18px); opacity: 0; }
+}

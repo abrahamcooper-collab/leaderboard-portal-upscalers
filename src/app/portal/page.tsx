@@ -11,7 +11,8 @@ import { formatMonth } from "@/lib/month";
 
 const CLOSER_LINKS: readonly NavLink[] = [
   { href: "/portal", label: "My team" },
-  { href: "/board", label: "Leaderboard" },
+  { href: "/sales-floor", label: "Sales Floor" },
+  { href: "/operations-closeout", label: "Operations Closeout" },
 ];
 
 export default async function CloserPortalPage() {

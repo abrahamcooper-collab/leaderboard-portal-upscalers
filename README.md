@@ -5,7 +5,8 @@ celebration video whenever an admin records a sale.
 
 - **Admins** manage closers, teams, agents, monthly targets and videos, and record sales.
 - **Closers** see their team's stats and can rename agents or change their phone numbers.
-- **The leaderboard** (`/board`) is built for a TV. It updates live and celebrates each new sale.
+- **The Sales Floor** (`/sales-floor`) is built for a TV. It updates live and celebrates each new sale.
+- **Operations Closeout** (`/operations-closeout`) is the closer race: each closer runs toward their team target, with a happy, neutral or sad bitmoji by position. After a team's sale, its runner runs for 10 minutes and covers the new distance in exactly that time.
 
 Stack: Next.js 16 (App Router, Server Actions), Tailwind CSS v4, Supabase (Postgres, Auth, Realtime, Storage), deployed on Vercel.
 
@@ -19,14 +20,19 @@ Stack: Next.js 16 (App Router, Server Actions), Tailwind CSS v4, Supabase (Postg
 | Removing agents and closers | Archives them (`archived_at`) instead of deleting rows, so their sales are kept. A removed agent's sales still count toward the team total that month. The database blocks hard deletes that would take sales with them. |
 | Live celebration | The board subscribes to inserts on `sales` (Supabase Realtime). |
 | Videos | Supabase Storage bucket `celebration-videos`. The board downloads them once on load. |
-| Code by feature | `src/features/{auth,teams,agents,sales,leaderboard}` (queries, actions, components) |
+| Team colours and avatars | `teams.color` (palette in `src/features/teams/team-colors.ts`). Bitmojis go in the `avatars` bucket and show initials until set. |
+| Code by feature | `src/features/{auth,teams,agents,sales,leaderboard,sales-floor,closer-race}` (queries, actions, components) |
 
 ## Setup
 
 ### 1. Create the Supabase project
 
 1. Create a project at [supabase.com](https://supabase.com).
-2. Open **SQL Editor** and run each file in `supabase/migrations/` in name order: `20261028000000_init.sql` first, then `20261028010000_archive_instead_of_delete.sql`.
+2. Open **SQL Editor** and run each file in `supabase/migrations/` in name order:
+   1. `20261028000000_init.sql`
+   2. `20261028010000_archive_instead_of_delete.sql`
+   3. `20261031000000_sales_floor.sql`
+   4. `20261031010000_closer_moods.sql`
 
 ### 2. Create the first admin
 
@@ -73,7 +79,7 @@ The Hobby plan is for non-commercial use only, so use Vercel Pro for the real th
 
 ## Setting up the TV
 
-1. Sign in on the TV's browser (any admin or closer account) and open `/board`.
+1. Sign in on the TV's browser (any admin or closer account) and open `/sales-floor`.
 2. Click **Enable sound**. Browsers block video sound until someone clicks the page once.
 3. Click **Full screen**.
 

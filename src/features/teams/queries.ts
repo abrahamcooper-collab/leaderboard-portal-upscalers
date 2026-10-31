@@ -1,12 +1,22 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { toTeamColor, type TeamColor } from "./team-colors";
 import { createClient } from "@/lib/supabase/server";
+
+/** Storage paths of a closer's bitmoji in each mood (null = not uploaded). */
+export type CloserFaces = {
+  neutral: string | null;
+  happy: string | null;
+  sad: string | null;
+};
 
 export type TeamSummary = {
   id: string;
   name: string;
   closerName: string;
   closerPhone: string | null;
+  closerFaces: CloserFaces;
+  color: TeamColor;
   videoPath: string | null;
 };
 
@@ -18,7 +28,7 @@ export type TeamDetail = TeamSummary & {
 export type AgentContact = { id: string; name: string; phone: string | null };
 
 const TEAM_COLUMNS =
-  "id, name, closer_id, celebration_video_path, closer:profiles!teams_closer_id_fkey(full_name, phone)";
+  "id, name, color, closer_id, celebration_video_path, closer:profiles!teams_closer_id_fkey(full_name, phone, avatar_path, avatar_happy_path, avatar_sad_path)";
 
 export async function listTeams(): Promise<TeamSummary[]> {
   const supabase = await createClient();
@@ -33,6 +43,8 @@ export async function listTeams(): Promise<TeamSummary[]> {
     name: team.name,
     closerName: team.closer.full_name,
     closerPhone: team.closer.phone,
+    closerFaces: toCloserFaces(team.closer),
+    color: toTeamColor(team.color),
     videoPath: team.celebration_video_path,
   }));
 }
@@ -60,7 +72,9 @@ export async function getTeamForAdmin(teamId: string): Promise<TeamDetail | null
     closerId: team.closer_id,
     closerName: team.closer.full_name,
     closerPhone: team.closer.phone,
+    closerFaces: toCloserFaces(team.closer),
     closerEmail: auth?.user?.email ?? null,
+    color: toTeamColor(team.color),
     videoPath: team.celebration_video_path,
   };
 }
@@ -87,4 +101,12 @@ export async function listAgentContacts(teamId: string): Promise<AgentContact[]>
     .order("name");
   if (error) throw new Error(`Listing agents for team ${teamId} failed: ${error.message}`);
   return data;
+}
+
+function toCloserFaces(closer: {
+  avatar_path: string | null;
+  avatar_happy_path: string | null;
+  avatar_sad_path: string | null;
+}): CloserFaces {
+  return { neutral: closer.avatar_path, happy: closer.avatar_happy_path, sad: closer.avatar_sad_path };
 }

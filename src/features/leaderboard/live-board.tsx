@@ -1,72 +1,46 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useCallback, useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { createClient } from "@/lib/supabase/browser";
+import { SalesFloorView } from "@/features/sales-floor/sales-floor-view";
 import type { Database } from "@/lib/supabase/database.types";
 import { videoPublicUrl } from "@/lib/supabase/storage";
 import { CelebrationOverlay, type Celebration } from "./celebration-overlay";
-import { LeaderboardView } from "./leaderboard-view";
 import type { TeamStanding } from "./model";
+import { useLiveSales, type SaleRow } from "./use-live-sales";
 import { usePreloadedVideos } from "./use-preloaded-videos";
 
-type SaleRow = Database["public"]["Tables"]["sales"]["Row"];
-
-// Catches anything Realtime missed (e.g. the TV slept) and rolls the month over.
-const FALLBACK_REFRESH_MS = 5 * 60_000;
-
 /**
- * The leaderboard, kept live: every sale insert queues a full-screen
+ * The Sales Floor, kept live: every sale insert queues a full-screen
  * celebration and re-fetches the standings from the server. `videoUrls` are
  * all teams' celebration videos, downloaded up front so they play instantly.
  */
 export function LiveBoard({
   standings,
+  monthLabel,
   videoUrls,
 }: {
   standings: readonly TeamStanding[];
+  monthLabel: string;
   videoUrls: readonly string[];
 }) {
-  const router = useRouter();
   const preloadedVideos = usePreloadedVideos(videoUrls);
   const [queue, setQueue] = useState<Celebration[]>([]);
   // Browsers only allow video with sound after someone interacts with the page.
   const [soundOn, setSoundOn] = useState(false);
-  const hasSubscribedRef = useRef(false);
 
-  useEffect(() => {
-    const supabase = createClient();
-
-    const channel = supabase
-      .channel("board-sales")
-      .on<SaleRow>("postgres_changes", { event: "*", schema: "public", table: "sales" }, (payload) => {
-        router.refresh();
-        if (payload.eventType !== "INSERT") return;
-        loadCelebration(supabase, payload.new).then((celebration) => {
-          if (celebration) setQueue((current) => [...current, celebration]);
-        });
-      })
-      .subscribe((status) => {
-        // On re-subscribe after a dropped connection, catch up on missed sales.
-        if (status !== "SUBSCRIBED") return;
-        if (hasSubscribedRef.current) router.refresh();
-        hasSubscribedRef.current = true;
-      });
-
-    const interval = setInterval(() => router.refresh(), FALLBACK_REFRESH_MS);
-    return () => {
-      clearInterval(interval);
-      supabase.removeChannel(channel);
-    };
-  }, [router]);
+  useLiveSales("sales-floor", (supabase, sale) => {
+    loadCelebration(supabase, sale).then((celebration) => {
+      if (celebration) setQueue((current) => [...current, celebration]);
+    });
+  });
 
   const finishCurrent = useCallback(() => setQueue((current) => current.slice(1)), []);
   const current = queue[0];
 
   return (
     <>
-      <LeaderboardView standings={standings} />
+      <SalesFloorView standings={standings} monthLabel={monthLabel} />
       {current && (
         <CelebrationOverlay
           key={current.key}

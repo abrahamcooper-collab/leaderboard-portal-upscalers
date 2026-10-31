@@ -4,7 +4,8 @@ import { requireAdmin } from "@/lib/auth";
 const ADMIN_LINKS: readonly NavLink[] = [
   { href: "/admin/sales", label: "Sales" },
   { href: "/admin/teams", label: "Teams" },
-  { href: "/board", label: "Leaderboard" },
+  { href: "/sales-floor", label: "Sales Floor" },
+  { href: "/operations-closeout", label: "Operations Closeout" },
 ];
 
 export default async function AdminLayout({ children }: LayoutProps<"/admin">) {

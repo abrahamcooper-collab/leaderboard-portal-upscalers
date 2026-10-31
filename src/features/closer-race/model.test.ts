@@ -1,0 +1,116 @@
+import { describe, expect, it } from "vitest";
+import type { TeamStanding } from "@/features/leaderboard/model";
+import type { CloserFaces } from "@/features/teams/queries";
+import { RUN_AFTER_SALE_MS, moodFor, runEndsAt, summarizeRace, toRaceRunners, trackProgressAt } from "./model";
+
+const team = (id: string, name: string, salesTotal: number, target = 10_000): TeamStanding => ({
+  id,
+  name,
+  color: "gray",
+  closerName: name,
+  closerAvatarPath: null,
+  agents: [],
+  target,
+  salesCount: salesTotal > 0 ? 1 : 0,
+  salesTotal,
+});
+
+describe("moodFor", () => {
+  it("makes the leader happy, last sad and the middle neutral", () => {
+    const totals = [3700, 2500, 1000];
+    expect(totals.map((total) => moodFor(total, totals))).toEqual(["happy", "neutral", "sad"]);
+  });
+
+  it("is neutral for everyone when all are level", () => {
+    expect(moodFor(0, [0, 0, 0])).toBe("neutral");
+  });
+
+  it("gives tied runners the same mood", () => {
+    const totals = [500, 500, 100];
+    expect(totals.map((total) => moodFor(total, totals))).toEqual(["happy", "happy", "sad"]);
+  });
+});
+
+describe("toRaceRunners", () => {
+  const standings = [team("m", "Mike", 3700), team("b", "Bill", 2500), team("d", "Team Daniel", 1000)];
+
+  it("orders lanes by team order and ranks by sales", () => {
+    const runners = toRaceRunners(standings, new Map());
+    expect(runners.map((runner) => [runner.teamId, runner.rank])).toEqual([
+      ["d", 3],
+      ["b", 2],
+      ["m", 1],
+    ]);
+  });
+
+  it("caps progress at the finish line and handles a missing target", () => {
+    const [over, none] = toRaceRunners([team("d", "Daniel", 15_000), team("b", "Bill", 500, 0)], new Map());
+    expect(over.progress).toBe(1);
+    expect(none.progress).toBe(0);
+  });
+
+  it("picks the bitmoji for the mood, falling back to neutral", () => {
+    const faces = new Map<string, CloserFaces>([
+      ["m", { neutral: "m/neutral.png", happy: "m/happy.png", sad: null }],
+      ["d", { neutral: "d/neutral.png", happy: null, sad: null }],
+    ]);
+    const runners = toRaceRunners(standings, faces);
+    expect(runners.find((runner) => runner.teamId === "m")?.facePath).toBe("m/happy.png");
+    expect(runners.find((runner) => runner.teamId === "d")?.facePath).toBe("d/neutral.png");
+    expect(runners.find((runner) => runner.teamId === "b")?.facePath).toBeNull();
+  });
+});
+
+describe("summarizeRace", () => {
+  it("totals targets and sales and names a clear leader", () => {
+    const summary = summarizeRace(
+      toRaceRunners([team("d", "Daniel", 1000), team("b", "Bill", 2500), team("m", "Mike", 10_000)], new Map()),
+    );
+    expect(summary).toEqual({
+      teamTarget: 30_000,
+      perCloserTarget: 10_000,
+      teamSales: 13_500,
+      leaderName: "Mike",
+      finishedCount: 1,
+    });
+  });
+
+  it("has no leader on a tie or before any sales, and no per-closer target when they differ", () => {
+    const tied = summarizeRace(toRaceRunners([team("d", "Daniel", 500), team("b", "Bill", 500, 8000)], new Map()));
+    expect(tied.leaderName).toBeNull();
+    expect(tied.perCloserTarget).toBeNull();
+    expect(summarizeRace(toRaceRunners([team("d", "Daniel", 0)], new Map())).leaderName).toBeNull();
+  });
+});
+
+describe("trackProgressAt", () => {
+  const saleAt = Date.parse("2026-10-31T12:00:00Z");
+  const sale = (offsetMs: number, amount: number) => ({ soldAt: new Date(saleAt + offsetMs).toISOString(), amount });
+  const at = (offsetMs: number, recentSales = [sale(0, 1000)], salesTotal = 3000) =>
+    trackProgressAt({ salesTotal, target: 10_000, recentSales, now: saleAt + offsetMs });
+
+  it("starts where the runner was before the sale and arrives exactly when the run ends", () => {
+    expect(at(0)).toBeCloseTo(0.2);
+    expect(at(RUN_AFTER_SALE_MS / 2)).toBeCloseTo(0.25);
+    expect(at(RUN_AFTER_SALE_MS)).toBeCloseTo(0.3);
+    expect(at(RUN_AFTER_SALE_MS * 2)).toBeCloseTo(0.3);
+  });
+
+  it("adds overlapping sales, finishing when the newest one's run ends", () => {
+    const sales = [sale(0, 1000), sale(RUN_AFTER_SALE_MS / 2, 2000)];
+    expect(at(RUN_AFTER_SALE_MS / 2, sales)).toBeCloseTo(0.05);
+    expect(at(RUN_AFTER_SALE_MS, sales)).toBeCloseTo(0.2);
+    expect(at(RUN_AFTER_SALE_MS * 1.5, sales)).toBeCloseTo(0.3);
+    expect(runEndsAt(sales)).toBe(saleAt + RUN_AFTER_SALE_MS * 1.5);
+  });
+
+  it("never goes below the start, past the real total, or past the finish line", () => {
+    expect(at(0, [sale(0, 5000)], 3000)).toBe(0);
+    expect(at(RUN_AFTER_SALE_MS, [sale(0, 1000)], 30_000)).toBe(1);
+    expect(trackProgressAt({ salesTotal: 500, target: 0, recentSales: [], now: saleAt })).toBe(0);
+  });
+
+  it("has no run end without recent sales", () => {
+    expect(runEndsAt([])).toBe(0);
+  });
+});

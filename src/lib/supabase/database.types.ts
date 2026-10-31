@@ -16,6 +16,9 @@ export type Database = {
           full_name: string;
           phone: string | null;
           role: UserRole;
+          avatar_path: string | null;
+          avatar_happy_path: string | null;
+          avatar_sad_path: string | null;
           created_at: string;
         };
         Insert: {
@@ -23,12 +26,18 @@ export type Database = {
           full_name: string;
           phone?: string | null;
           role: UserRole;
+          avatar_path?: string | null;
+          avatar_happy_path?: string | null;
+          avatar_sad_path?: string | null;
           created_at?: string;
         };
         Update: {
           full_name?: string;
           phone?: string | null;
           role?: UserRole;
+          avatar_path?: string | null;
+          avatar_happy_path?: string | null;
+          avatar_sad_path?: string | null;
         };
         Relationships: [];
       };
@@ -38,6 +47,7 @@ export type Database = {
           closer_id: string;
           name: string;
           celebration_video_path: string | null;
+          color: string;
           archived_at: string | null;
           created_at: string;
         };
@@ -46,11 +56,13 @@ export type Database = {
           closer_id: string;
           name: string;
           celebration_video_path?: string | null;
+          color?: string;
           created_at?: string;
         };
         Update: {
           name?: string;
           celebration_video_path?: string | null;
+          color?: string;
           archived_at?: string | null;
         };
         Relationships: [
@@ -69,6 +81,7 @@ export type Database = {
           team_id: string;
           name: string;
           phone: string | null;
+          avatar_path: string | null;
           archived_at: string | null;
           created_at: string;
         };
@@ -83,6 +96,7 @@ export type Database = {
           team_id?: string;
           name?: string;
           phone?: string | null;
+          avatar_path?: string | null;
           archived_at?: string | null;
         };
         Relationships: [
@@ -151,6 +165,7 @@ export type Database = {
           p_full_name: string;
           p_phone: string | null;
           p_team_name: string;
+          p_color: string;
         };
         Returns: string;
       };
@@ -160,6 +175,7 @@ export type Database = {
           p_full_name: string;
           p_phone: string | null;
           p_team_name: string;
+          p_color: string;
         };
         Returns: undefined;
       };
@@ -169,9 +185,12 @@ export type Database = {
         Returns: {
           team_id: string;
           team_name: string;
+          team_color: string;
           closer_name: string;
+          closer_avatar_path: string | null;
           agent_id: string | null;
           agent_name: string | null;
+          agent_avatar_path: string | null;
           agent_archived: boolean | null;
           target: number | null;
           sales_count: number;

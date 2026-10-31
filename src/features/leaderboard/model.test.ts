@@ -4,9 +4,12 @@ import { targetProgress, toTeamStandings, type LeaderboardRow } from "./model";
 const row = (overrides: Partial<LeaderboardRow>): LeaderboardRow => ({
   team_id: "t1",
   team_name: "Alpha",
+  team_color: "gold",
   closer_name: "Sara",
+  closer_avatar_path: null,
   agent_id: "a1",
   agent_name: "Ali",
+  agent_avatar_path: null,
   agent_archived: false,
   target: 1000,
   sales_count: 0,
@@ -37,9 +40,14 @@ describe("toTeamStandings", () => {
     expect(team.agents.find((a) => a.id === "a2")?.archived).toBe(true);
   });
 
+  it("falls back to gray for an unknown team colour", () => {
+    const [team] = toTeamStandings([row({ team_color: "neon" })]);
+    expect(team.color).toBe("gray");
+  });
+
   it("keeps teams without agents, with zero totals", () => {
     const [team] = toTeamStandings([
-      row({ agent_id: null, agent_name: null, agent_archived: null, target: null }),
+      row({ agent_id: null, agent_name: null, agent_avatar_path: null, agent_archived: null, target: null }),
     ]);
     expect(team).toMatchObject({ id: "t1", agents: [], salesTotal: 0, target: 0 });
   });

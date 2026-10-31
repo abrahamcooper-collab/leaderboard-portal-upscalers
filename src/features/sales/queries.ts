@@ -44,3 +44,22 @@ export async function listSaleOptions(): Promise<SaleTeamOption[]> {
   if (error) throw new Error(`Listing sale options failed: ${error.message}`);
   return data.filter((team) => team.agents.length > 0);
 }
+
+export type RecentTeamSale = { soldAt: string; amount: number };
+
+/** Sales made within the last `withinMs`, grouped by team id. Teams with none are absent. */
+export async function getRecentSalesByTeam(withinMs: number): Promise<Record<string, RecentTeamSale[]>> {
+  const supabase = await createClient();
+  const since = new Date(Date.now() - withinMs).toISOString();
+  const { data, error } = await supabase
+    .from("sales")
+    .select("sold_at, amount, agent:agents(team_id)")
+    .gte("sold_at", since);
+  if (error) throw new Error(`Loading recent sales since ${since} failed: ${error.message}`);
+
+  const byTeam: Record<string, RecentTeamSale[]> = {};
+  for (const sale of data) {
+    (byTeam[sale.agent.team_id] ??= []).push({ soldAt: sale.sold_at, amount: sale.amount });
+  }
+  return byTeam;
+}

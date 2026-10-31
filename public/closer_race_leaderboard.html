@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Closer Race | $10K Challenge</title>
+<style>
+:root{--bg:#070a12;--panel:#101625;--line:#253047;--text:#f4f7ff;--muted:#9aa8c0;--cyan:#25c9ff;--gold:#ffbf36;--green:#7af06c;--pink:#f45ee8}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#17254b 0%,#080b14 50%,#05070d 100%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+.wrap{max-width:1400px;margin:auto;padding:28px 22px 42px}.eyebrow{text-align:center;color:var(--cyan);letter-spacing:.24em;font-size:.75rem;font-weight:900}.headline{text-align:center;font-size:clamp(2rem,5vw,4.4rem);line-height:1.02;margin:10px 0 8px;font-weight:1000;letter-spacing:-.045em;text-shadow:0 0 28px #25c9ff36}.headline span{color:var(--gold)}.sub{text-align:center;color:var(--muted);margin:0 auto 26px;max-width:700px}
+.topbar{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:20px 0 24px}.pill{border:1px solid #2d3c58;background:#0c1220;padding:9px 14px;border-radius:999px;color:#c6d5ee;font-size:.82rem}.pill b{color:white}
+.track-shell{position:relative;padding:25px 20px 20px;border:1px solid #283752;border-radius:24px;background:linear-gradient(180deg,#101726,#090e18);box-shadow:0 20px 70px #0008,inset 0 0 35px #12203b66;overflow:hidden}
+.scale{display:flex;justify-content:space-between;color:#b9c7df;font-size:.76rem;font-weight:800;padding:0 2px 12px}.scale span:last-child{color:var(--green)}
+.track{position:relative;min-height:345px;border-radius:100px;background:linear-gradient(180deg,#303847,#171e2b 25%,#202735 50%,#141b27 75%,#303847);border:3px solid #46556e;box-shadow:inset 0 8px 20px #0008,inset 0 -8px 20px #0008,0 0 26px #25c9ff22;overflow:hidden}
+.track:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 47px,#a9bdd01c 48px 50px),linear-gradient(90deg,#25c9ff16,transparent 25%,#f45ee812 65%,#7af06c18);pointer-events:none}
+.track:after{content:"";position:absolute;left:2%;right:2%;top:50%;border-top:3px dashed #e4ecf4a8;transform:translateY(-50%);pointer-events:none}
+.gridlines{position:absolute;inset:0 2%;display:flex;justify-content:space-between;pointer-events:none}.gridlines i{height:100%;border-left:1px dashed #c4d4ea42}
+.finish{position:absolute;right:0;top:0;bottom:0;width:22px;background:repeating-conic-gradient(#fff 0% 25%,#141820 0% 50%) 50%/18px 18px;box-shadow:0 0 20px #7af06c77;z-index:2}
+.startflag{position:absolute;left:8px;top:10px;color:#c7d7ee;font-size:.65rem;font-weight:900;z-index:3}
+.lane{position:absolute;left:0;right:0;height:33.333%;border-bottom:1px solid #d3e2f31c}.lane:nth-child(1){top:0}.lane:nth-child(2){top:33.333%}.lane:nth-child(3){top:66.666%;border:0}
+.runner-wrap{position:absolute;top:50%;transform:translate(-50%,-50%);width:76px;z-index:5;transition:left 1.25s cubic-bezier(.2,.8,.2,1);text-align:center;--runner:var(--cyan)}
+.runner-wrap .money{display:inline-block;white-space:nowrap;font-size:.8rem;font-weight:1000;padding:6px 9px;border-radius:10px;background:#080d18;border:1px solid var(--runner);box-shadow:0 0 18px color-mix(in srgb,var(--runner) 40%,transparent);margin-bottom:3px}
+.runner{font-size:54px;line-height:1;display:block;filter:drop-shadow(0 0 12px color-mix(in srgb,var(--runner) 70%,transparent));animation:run .42s infinite alternate ease-in-out;transform-origin:50% 90%}
+.runner-wrap .tag{display:inline-block;white-space:nowrap;font-size:.66rem;font-weight:1000;letter-spacing:.04em;padding:4px 7px;border-radius:7px;background:var(--runner);color:#07101c;margin-top:4px;max-width:100px;overflow:hidden;text-overflow:ellipsis}
+@keyframes run{from{transform:translateY(0) rotate(-5deg) scaleX(1)}to{transform:translateY(-5px) rotate(4deg) scaleX(1.04)}}
+@keyframes flash{0%,100%{filter:brightness(1)}50%{filter:brightness(1.7)}}
+.runner-wrap.boost .runner{animation:run .18s infinite alternate,flash .4s infinite}
+.goal-label{position:absolute;right:25px;top:10px;z-index:4;color:var(--green);font-weight:1000;font-size:.8rem;text-shadow:0 0 12px #7af06c66}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:20px 0}
+.card{--runner:var(--cyan);background:linear-gradient(145deg,#111a2a,#0a0f19);border:1px solid color-mix(in srgb,var(--runner) 75%,#172237);border-radius:18px;padding:16px;box-shadow:0 10px 28px #0003;min-width:0}
+.card-head{display:flex;align-items:center;gap:12px}.avatar{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-size:27px;background:#0a111f;border:2px solid var(--runner);box-shadow:0 0 18px color-mix(in srgb,var(--runner) 30%,transparent)}.who{min-width:0;flex:1}.name{width:100%;background:transparent;border:0;border-bottom:1px solid #ffffff26;color:var(--runner);font-size:1.08rem;font-weight:1000;padding:4px 0;outline:none}.rank{font-size:.72rem;color:var(--muted);font-weight:900;white-space:nowrap}.amount-row{display:flex;justify-content:space-between;gap:8px;align-items:baseline;margin:14px 0 8px}.amount{font-size:1.5rem;font-weight:1000;letter-spacing:-.04em}.pct{font-weight:900;color:var(--runner)}.bar{height:9px;background:#202b3d;border-radius:20px;overflow:hidden}.fill{height:100%;width:10%;background:linear-gradient(90deg,var(--runner),color-mix(in srgb,var(--runner) 55%,white));border-radius:20px;transition:width .7s ease;box-shadow:0 0 15px color-mix(in srgb,var(--runner) 40%,transparent)}
+.controls{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:14px;align-items:end}.field label{display:block;font-size:.7rem;color:var(--muted);font-weight:800;margin-bottom:6px}.field input{width:100%;background:#080d17;border:1px solid #2a3850;border-radius:9px;padding:10px;color:white;font:inherit}.btn{border:1px solid #3b4c67;background:#17243a;color:#fff;padding:10px 12px;border-radius:9px;font-weight:900;cursor:pointer;transition:transform .15s,background .15s}.btn:hover{background:#243855;transform:translateY(-1px)}.btn.primary{background:linear-gradient(90deg,#087ca6,#1451a7);border-color:#27caff}.quick{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}.quick .btn{font-size:.75rem;padding:7px 9px}.footer{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;padding:18px 2px 0;color:var(--muted);font-size:.82rem}.footer strong{color:var(--green)}.reset{background:transparent;border:1px solid #34425a;color:#aebbd0;border-radius:8px;padding:8px 10px;cursor:pointer}.notice{text-align:center;color:#72839e;font-size:.72rem;margin-top:18px}
+@media(max-width:800px){.cards{grid-template-columns:1fr}.track{min-height:300px}.runner{font-size:43px}.runner-wrap{width:64px}.track-shell{padding:18px 10px}.scale{font-size:.62rem}.card{padding:14px}.headline{font-size:2.4rem}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">UPSCALERS • SALES PERFORMANCE ARENA</div>
+  <h1 class="headline">CLOSER <span>RACE</span></h1>
+  <p class="sub">Three closers. One target. Every deal moves you closer to the crown.</p>
+  <div class="topbar">
+    <div class="pill">🎯 TEAM TARGET <b>$30,000</b></div>
+    <div class="pill">🏁 PER CLOSER <b>$10,000</b></div>
+    <div class="pill">⚡ CURRENT TEAM SALES <b id="teamTotal">$7,200</b></div>
+    <div class="pill">👑 LEADER <b id="leaderName">Chris</b></div>
+  </div>
+  <section class="track-shell">
+    <div class="scale"><span>$0 · START</span><span>$2,500</span><span>$5,000</span><span>$7,500</span><span>$10,000 · FINISH</span></div>
+    <div class="track" id="track">
+      <div class="gridlines"><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="lane"></div><div class="lane"></div><div class="lane"></div>
+      <div class="startflag">START ▸</div><div class="goal-label">🏆 $10K GOAL</div><div class="finish"></div>
+      <div class="runner-wrap" id="runner0" style="left:10%;top:18%;--runner:#25c9ff"><span class="money" id="bubble0">$1,000</span><span class="runner">🏃🏻‍♂️</span><span class="tag" id="tag0">ALEX</span></div>
+      <div class="runner-wrap" id="runner1" style="left:25%;top:51%;--runner:#ffbf36"><span class="money" id="bubble1">$2,500</span><span class="runner">🏃🏽‍♂️</span><span class="tag" id="tag1">BRANDON</span></div>
+      <div class="runner-wrap" id="runner2" style="left:37%;top:84%;--runner:#7af06c"><span class="money" id="bubble2">$3,700</span><span class="runner">🏃🏼‍♂️</span><span class="tag" id="tag2">CHRIS</span></div>
+    </div>
+  </section>
+  <div class="cards" id="cards">
+    <section class="card" style="--runner:#25c9ff" data-i="0">
+      <div class="card-head"><div class="avatar">🏃🏻‍♂️</div><div class="who"><input class="name" aria-label="Closer 1 name" value="Alex" maxlength="22"><div class="rank" id="rank0">RANK #3</div></div></div>
+      <div class="amount-row"><div class="amount" id="amount0">$1,000</div><div class="pct" id="pct0">10%</div></div>
+      <div class="bar"><div class="fill" id="fill0" style="width:10%"></div></div>
+      <div class="controls"><div class="field"><label for="sales0">CURRENT SALES ($)</label><input type="number" id="sales0" min="0" max="10000000" step="50" value="1000"></div><button class="btn primary" data-add="0">+ Add sale</button></div>
+      <div class="quick"><button class="btn" data-quick="0" data-value="100">$100</button><button class="btn" data-quick="0" data-value="250">+$250</button><button class="btn" data-quick="0" data-value="500">+$500</button><button class="btn" data-quick="0" data-value="1000">+$1K</button></div>
+    </section>
+    <section class="card" style="--runner:#ffbf36" data-i="1">
+      <div class="card-head"><div class="avatar">🏃🏽‍♂️</div><div class="who"><input class="name" aria-label="Closer 2 name" value="Brandon" maxlength="22"><div class="rank" id="rank1">RANK #2</div></div></div>
+      <div class="amount-row"><div class="amount" id="amount1">$2,500</div><div class="pct" id="pct1">25%</div></div>
+      <div class="bar"><div class="fill" id="fill1" style="width:25%"></div></div>
+      <div class="controls"><div class="field"><label for="sales1">CURRENT SALES ($)</label><input type="number" id="sales1" min="0" max="10000000" step="50" value="2500"></div><button class="btn primary" data-add="1">+ Add sale</button></div>
+      <div class="quick"><button class="btn" data-quick="1" data-value="100">+$100</button><button class="btn" data-quick="1" data-value="250">+$250</button><button class="btn" data-quick="1" data-value="500">+$500</button><button class="btn" data-quick="1" data-value="1000">+$1K</button></div>
+    </section>
+    <section class="card" style="--runner:#7af06c" data-i="2">
+      <div class="card-head"><div class="avatar">🏃🏼‍♂️</div><div class="who"><input class="name" aria-label="Closer 3 name" value="Chris" maxlength="22"><div class="rank" id="rank2">RANK #1</div></div></div>
+      <div class="amount-row"><div class="amount" id="amount2">$3,700</div><div class="pct" id="pct2">37%</div></div>
+      <div class="bar"><div class="fill" id="fill2" style="width:37%"></div></div>
+      <div class="controls"><div class="field"><label for="sales2">CURRENT SALES ($)</label><input type="number" id="sales2" min="0" max="10000000" step="50" value="3700"></div><button class="btn primary" data-add="2">+ Add sale</button></div>
+      <div class="quick"><button class="btn" data-quick="2" data-value="100">+$100</button><button class="btn" data-quick="2" data-value="250">+$250</button><button class="btn" data-quick="2" data-value="500">+$500</button><button class="btn" data-quick="2" data-value="1000">+$1K</button></div>
+    </section>
+  </div>
+  <div class="footer"><div>🏁 <strong id="finishCount">0</strong> of 3 closers have reached the $10K target.</div><button class="reset" id="reset">Reset starting totals</button></div>
+  <div class="notice">Editable prototype · Totals and names save in this browser on this device. For a shared live team leaderboard, connect it to a shared data source such as Google Sheets.</div>
+</div>
+<script>
+(() => {
+ const target=10000, initial=[1000,2500,3700], colors=['#25c9ff','#ffbf36','#7af06c'];
+ let sales=initial.slice(), names=['Alex','Brandon','Chris'];
+ const money=n=>'$'+Math.round(n).toLocaleString('en-US');
+ const safeName=(s,i)=>s.trim()||`Closer ${i+1}`;
+ function load(){try{const d=JSON.parse(localStorage.getItem('closerRaceBoard'));if(d&&Array.isArray(d.sales)&&d.sales.length===3){sales=d.sales.map(n=>Math.max(0,Number(n)||0));names=(d.names||names).map((n,i)=>safeName(String(n),i));}}catch(e){}}
+ function save(){try{localStorage.setItem('closerRaceBoard',JSON.stringify({sales,names}));}catch(e){}}
+ function render(){
+  const sorted=[0,1,2].sort((a,b)=>sales[b]-sales[a]);
+  const team=sales.reduce((a,b)=>a+b,0);
+  document.getElementById('teamTotal').textContent=money(team);
+  document.getElementById('leaderName').textContent=names[sorted[0]];
+  document.getElementById('finishCount').textContent=sales.filter(n=>n>=target).length;
+  for(let i=0;i<3;i++){
+   const p=Math.min(100,sales[i]/target*100);
+   document.getElementById('sales'+i).value=Math.round(sales[i]);
+   document.getElementById('amount'+i).textContent=money(sales[i]);
+   document.getElementById('pct'+i).textContent=Math.round(p)+'%'+(sales[i]>=target?' 🏆':'');
+   document.getElementById('fill'+i).style.width=p+'%';
+   document.getElementById('rank'+i).textContent='RANK #'+(sorted.indexOf(i)+1)+(sorted.indexOf(i)===0?' · LEADER':'');
+   document.querySelectorAll('.name')[i].value=names[i];
+   const pos=2+Math.min(94,p);
+   const runner=document.getElementById('runner'+i);
+   runner.style.left=pos+'%';
+   runner.style.setProperty('--runner',colors[i]);
+   document.getElementById('bubble'+i).textContent=money(sales[i]);
+   document.getElementById('tag'+i).textContent=names[i].toUpperCase();
+   runner.classList.toggle('boost',sales[i]>=target);
+   if(sales[i]>=target && !runner.dataset.celebrated){runner.dataset.celebrated='1';runner.querySelector('.runner').textContent='🏆';}
+   if(sales[i]<target){runner.dataset.celebrated='';runner.querySelector('.runner').textContent=['🏃🏻‍♂️','🏃🏽‍♂️','🏃🏼‍♂️'][i];}
+  }
+  save();
+ }
+ document.querySelectorAll('.name').forEach((el,i)=>el.addEventListener('input',()=>{names[i]=safeName(el.value,i);document.getElementById('tag'+i).textContent=names[i].toUpperCase();document.getElementById('leaderName').textContent=names[[0,1,2].sort((a,b)=>sales[b]-sales[a])[0]];save();}));
+ [0,1,2].forEach(i=>document.getElementById('sales'+i).addEventListener('change',e=>{sales[i]=Math.max(0,Math.min(10000000,Number(e.target.value)||0));render();}));
+ document.querySelectorAll('[data-add]').forEach(b=>b.addEventListener('click',()=>{const i=Number(b.dataset.add);const raw=prompt('Enter the value of the sale to add ($):','500');if(raw===null)return;const v=Number(raw);if(Number.isFinite(v)&&v>0){sales[i]+=v;render();}}));
+ document.querySelectorAll('[data-quick]').forEach(b=>b.addEventListener('click',()=>{const i=Number(b.dataset.quick);sales[i]+=Number(b.dataset.value);render();}));
+ document.getElementById('reset').addEventListener('click',()=>{if(confirm('Reset all sales totals and names to the starting values?')){sales=initial.slice();names=['Alex','Brandon','Chris'];render();}});
+ load();render();
+})();
+</script>
+</body>
+</html>

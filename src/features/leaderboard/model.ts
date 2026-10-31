@@ -1,3 +1,5 @@
+import { toTeamColor, type TeamColor } from "@/features/teams/team-colors";
+
 /**
  * Turns flat leaderboard rows (one per agent, from the `leaderboard` SQL
  * function) into ranked teams. Pure, so it's shared by the server render and
@@ -7,9 +9,12 @@
 export type LeaderboardRow = {
   team_id: string;
   team_name: string;
+  team_color: string;
   closer_name: string;
+  closer_avatar_path: string | null;
   agent_id: string | null;
   agent_name: string | null;
+  agent_avatar_path: string | null;
   agent_archived: boolean | null;
   target: number | null;
   sales_count: number;
@@ -19,6 +24,7 @@ export type LeaderboardRow = {
 export type AgentStanding = {
   id: string;
   name: string;
+  avatarPath: string | null;
   /** Removed from the team, but listed because they made sales this month. */
   archived: boolean;
   target: number | null;
@@ -29,7 +35,9 @@ export type AgentStanding = {
 export type TeamStanding = {
   id: string;
   name: string;
+  color: TeamColor;
   closerName: string;
+  closerAvatarPath: string | null;
   agents: AgentStanding[];
   target: number;
   salesCount: number;
@@ -46,7 +54,9 @@ export function toTeamStandings(rows: readonly LeaderboardRow[]): TeamStanding[]
       team = {
         id: row.team_id,
         name: row.team_name,
+        color: toTeamColor(row.team_color),
         closerName: row.closer_name,
+        closerAvatarPath: row.closer_avatar_path,
         agents: [],
         target: 0,
         salesCount: 0,
@@ -61,6 +71,7 @@ export function toTeamStandings(rows: readonly LeaderboardRow[]): TeamStanding[]
     team.agents.push({
       id: row.agent_id,
       name: row.agent_name ?? "",
+      avatarPath: row.agent_avatar_path,
       archived: row.agent_archived ?? false,
       target: row.target,
       salesCount: row.sales_count,
