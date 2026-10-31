@@ -58,9 +58,9 @@ export function SalesFloorView({
         </div>
       )}
 
-      <footer className="flex shrink-0 items-center gap-6 font-[family-name:var(--font-condensed)] text-xs uppercase tracking-[0.45em] text-zinc-400">
+      <footer className="flex shrink-0 flex-wrap items-center justify-between gap-x-6 gap-y-1 font-[family-name:var(--font-condensed)] text-xs uppercase tracking-[0.2em] text-zinc-400 sm:tracking-[0.45em]">
         <span className="shrink-0">We don&apos;t do average</span>
-        <span className="h-px flex-1 bg-zinc-600" />
+        <span className="hidden h-px flex-1 bg-zinc-600 sm:block" />
         <span className="shrink-0">Creative Giants</span>
       </footer>
     </div>

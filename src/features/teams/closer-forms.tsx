@@ -1,6 +1,6 @@
 import { ActionForm } from "@/components/action-form";
 import { Field, Input, Select } from "@/components/ui";
-import { createCloser, removeCloser, resetCloserPassword, updateCloser } from "./actions";
+import { createCloser, removeCloser, updateCloser, updateCloserLogin } from "./actions";
 import type { TeamDetail } from "./queries";
 import { TEAM_COLORS, TEAM_COLOR_IDS } from "./team-colors";
 
@@ -52,12 +52,16 @@ export function EditCloserForm({ team }: { team: TeamDetail }) {
   );
 }
 
-export function ResetPasswordForm({ teamId }: { teamId: string }) {
+/** The closer's sign-in details: email always, password only when a new one is typed. */
+export function CloserLoginForm({ team }: { team: TeamDetail }) {
   return (
-    <ActionForm action={resetCloserPassword} submitLabel="Set password" variant="secondary">
-      <input type="hidden" name="teamId" value={teamId} />
-      <Field label="New password">
-        <Input name="password" type="password" required minLength={8} autoComplete="new-password" />
+    <ActionForm action={updateCloserLogin} submitLabel="Save login" className="grid gap-4 sm:grid-cols-2">
+      <input type="hidden" name="teamId" value={team.id} />
+      <Field label="Login email">
+        <Input name="email" type="email" defaultValue={team.closerEmail ?? ""} required autoComplete="off" />
+      </Field>
+      <Field label="New password (leave blank to keep)">
+        <Input name="password" type="password" minLength={8} autoComplete="new-password" />
       </Field>
     </ActionForm>
   );

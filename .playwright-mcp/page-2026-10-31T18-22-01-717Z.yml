@@ -1,0 +1,84 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - navigation [ref=e5]:
+        - generic [ref=e6]: Sales Portal
+        - link "Sales" [ref=e7] [cursor=pointer]:
+          - /url: /admin/sales
+        - link "Teams" [ref=e8] [cursor=pointer]:
+          - /url: /admin/teams
+        - link "Sales Floor" [ref=e9] [cursor=pointer]:
+          - /url: /sales-floor
+        - link "Operations Closeout" [ref=e10] [cursor=pointer]:
+          - /url: /operations-closeout
+        - link "Page 3" [ref=e11] [cursor=pointer]:
+          - /url: /page-3
+        - link "Page 4" [ref=e12] [cursor=pointer]:
+          - /url: /page-4
+      - generic [ref=e13]:
+        - link "▶ Slideshow" [ref=e14] [cursor=pointer]:
+          - /url: /slideshow
+        - generic [ref=e15]:
+          - text: Admin Name
+          - button "Sign out" [ref=e16]
+  - main [ref=e17]:
+    - heading "Teams" [level=1] [ref=e19]
+    - generic [ref=e20]:
+      - list [ref=e23]:
+        - listitem [ref=e24]:
+          - link [ref=e25] [cursor=pointer]:
+            - /url: /admin/teams/f38c9bdd-4f46-4c56-8aa8-1dd17634096d
+            - generic [ref=e26]:
+              - img "Bill Anderson" [ref=e27]
+              - generic [ref=e28]:
+                - paragraph [ref=e29]: Team Bill
+                - paragraph [ref=e30]: Bill Anderson · 9292242482
+            - paragraph [ref=e31]: 6 agents · this month $0
+        - listitem [ref=e32]:
+          - link [ref=e33] [cursor=pointer]:
+            - /url: /admin/teams/bf5d431e-2590-48cc-a221-5adbda96440c
+            - generic [ref=e34]:
+              - img "Daniel Richard" [ref=e35]
+              - generic [ref=e36]:
+                - paragraph [ref=e37]: Team Daniel
+                - paragraph [ref=e38]: Daniel Richard · 123132
+            - paragraph [ref=e39]: 5 agents · this month $0
+        - listitem [ref=e40]:
+          - link [ref=e41] [cursor=pointer]:
+            - /url: /admin/teams/0dcce5c7-013e-4d01-9ee2-2322ff2aab07
+            - generic [ref=e42]:
+              - img "Mike Specter" [ref=e43]
+              - generic [ref=e44]:
+                - paragraph [ref=e45]: Team Mike
+                - paragraph [ref=e46]: Mike Specter · 123
+            - paragraph [ref=e47]: 5 agents · this month $0
+      - generic [ref=e48]:
+        - heading "New closer" [level=2] [ref=e49]
+        - paragraph [ref=e50]: Creates the closer's login and their team.
+        - generic [ref=e52]:
+          - generic [ref=e53]:
+            - text: Closer name
+            - textbox "Closer name" [ref=e54]
+          - generic [ref=e55]:
+            - text: Closer phone
+            - textbox "Closer phone" [ref=e56]
+          - generic [ref=e57]:
+            - text: Team name
+            - textbox "Team name" [ref=e58]
+          - generic [ref=e59]:
+            - text: Sales Floor colour
+            - combobox "Sales Floor colour" [ref=e60]:
+              - option "Gray" [selected]
+              - option "Electric cyan"
+              - option "Gold"
+              - option "Red"
+              - option "Blue"
+              - option "Green"
+              - option "Purple"
+          - generic [ref=e61]:
+            - text: Login email
+            - textbox "Login email" [ref=e62]
+          - generic [ref=e63]:
+            - text: Password (min. 8 characters)
+            - textbox "Password (min. 8 characters)" [ref=e64]
+          - button "Create closer" [ref=e66]

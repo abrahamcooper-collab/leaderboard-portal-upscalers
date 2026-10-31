@@ -1,5 +1,7 @@
+import type { StaticImageData } from "next/image";
 import { ActionForm } from "@/components/action-form";
 import { Field, Input } from "@/components/ui";
+import { Avatar } from "@/features/sales-floor/avatar";
 import { formatUsd } from "@/lib/money";
 import { createAgent, removeAgent, updateAgentAsAdmin, updateAgentContact } from "./actions";
 
@@ -41,23 +43,27 @@ function TargetField({ target }: { target?: number | null }) {
   );
 }
 
-function SalesSummary({ agent }: { agent: AgentRowData }) {
+/** The agent's board photo (initials when their name matches none) and this month's numbers. */
+function AgentSummary({ agent, photo }: { agent: AgentRowData; photo: StaticImageData | undefined }) {
   return (
-    <p className="text-sm text-slate-500">
-      This month: <span className="font-medium text-slate-900">{formatUsd(agent.salesTotal)}</span> from{" "}
-      {agent.salesCount} {agent.salesCount === 1 ? "sale" : "sales"}
-      {agent.target !== null && <> · target {formatUsd(agent.target)}</>}
-    </p>
+    <div className="flex items-center gap-3">
+      <Avatar name={agent.name} src={photo ?? null} size={36} />
+      <p className="text-sm text-slate-500">
+        This month: <span className="font-medium text-slate-900">{formatUsd(agent.salesTotal)}</span> from{" "}
+        {agent.salesCount} {agent.salesCount === 1 ? "sale" : "sales"}
+        {agent.target !== null && <> · target {formatUsd(agent.target)}</>}
+      </p>
+    </div>
   );
 }
 
 const ROW_FORM = "grid items-end gap-3 sm:grid-cols-[1fr_1fr_1fr_auto]";
 
 /** Admin: edit name, phone and this month's target, or remove the agent. */
-export function AdminAgentRow({ agent }: { agent: AgentRowData }) {
+export function AdminAgentRow({ agent, photo }: { agent: AgentRowData; photo: StaticImageData | undefined }) {
   return (
     <li className="flex flex-col gap-3 py-4">
-      <SalesSummary agent={agent} />
+      <AgentSummary agent={agent} photo={photo} />
       <ActionForm action={updateAgentAsAdmin} submitLabel="Save" variant="secondary" className={ROW_FORM}>
         <input type="hidden" name="agentId" value={agent.id} />
         <ContactFields agent={agent} />
@@ -76,10 +82,10 @@ export function AdminAgentRow({ agent }: { agent: AgentRowData }) {
 }
 
 /** Closer: edit name and phone only. */
-export function CloserAgentRow({ agent }: { agent: AgentRowData }) {
+export function CloserAgentRow({ agent, photo }: { agent: AgentRowData; photo: StaticImageData | undefined }) {
   return (
     <li className="flex flex-col gap-3 py-4">
-      <SalesSummary agent={agent} />
+      <AgentSummary agent={agent} photo={photo} />
       <ActionForm
         action={updateAgentContact}
         submitLabel="Save"

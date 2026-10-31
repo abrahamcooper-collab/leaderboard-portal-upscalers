@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { closerAvatarSrc } from "@/features/teams/avatars";
 import { TEAM_COLORS } from "@/features/teams/team-colors";
 import { formatUsd } from "@/lib/money";
@@ -16,11 +16,11 @@ const RUNNING_TRANSITION = `transform ${MOTION_TICK_MS}ms linear`;
 const SETTLE_TRANSITION = "transform 1s ease-out";
 const NO_RECENT_SALES: readonly RecentSale[] = [];
 
-function axisLabel(fraction: number, perCloserTarget: number | null): string {
+function axisLabel(fraction: number, perCloserTarget: number | null): ReactNode {
   const value = perCloserTarget === null ? `${fraction * 100}%` : formatUsd(fraction * perCloserTarget);
-  if (fraction === 0) return `${value} · Start`;
-  if (fraction === 1) return `${value} · Finish`;
-  return value;
+  const name = fraction === 0 ? "Start" : fraction === 1 ? "Finish" : null;
+  // On a phone the track is too short for both names; the values alone still fit.
+  return name ? <>{value}<span className="hidden sm:inline"> · {name}</span></> : value;
 }
 
 /**
@@ -47,7 +47,8 @@ export function RaceTrack({
           {QUARTERS.map((fraction) => (
             <span
               key={fraction}
-              className={`absolute whitespace-nowrap ${fraction === 1 ? "text-emerald-400" : ""}`}
+              // Narrow screens only have room for the start and finish labels.
+              className={`absolute whitespace-nowrap ${fraction === 1 ? "text-emerald-400" : ""} ${fraction > 0 && fraction < 1 ? "hidden sm:inline" : ""}`}
               style={{ left: `${fraction * 100}%`, transform: `translateX(-${fraction * 100}%)` }}
             >
               {axisLabel(fraction, perCloserTarget)}
@@ -98,7 +99,7 @@ function Lane({
   const style = { "--team-accent": accent, "--team-on-accent": onAccent } as CSSProperties;
 
   return (
-    <div style={style} className={`relative h-[clamp(10.5rem,16.5vh,11.5rem)] ${isLast ? "" : "border-b border-slate-600/40"}`}>
+    <div style={style} className={`relative h-[clamp(11rem,16.5vh,11.5rem)] ${isLast ? "" : "border-b border-slate-600/40"}`}>
       <div className="absolute inset-y-0 left-6 right-12">
         {/* The carrier spans the runner's whole travel, so translating it by `progress` of its own
             width puts the runner in place. A transform (not `left`) keeps the glide on the GPU,

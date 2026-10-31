@@ -3,6 +3,7 @@ import { Card, PageHeader } from "@/components/ui";
 import { CloserAgentRow } from "@/features/agents/agent-forms";
 import { toAgentRows } from "@/features/agents/agent-rows";
 import { getStandings } from "@/features/leaderboard/queries";
+import { matchTeamPhotos } from "@/features/teams/roster-photos";
 import { getTeamIdForCloser, listAgentContacts } from "@/features/teams/queries";
 import { requireCloser } from "@/lib/auth";
 import { currentMonth } from "@/lib/current-month";
@@ -30,6 +31,7 @@ export default async function CloserPortalPage() {
   const rank = standings.findIndex((standing) => standing.id === teamId);
   const team = standings[rank];
   const rows = toAgentRows(agents, team);
+  const photos = matchTeamPhotos(team?.name ?? "", agents.map((agent) => agent.name)).byAgent;
 
   return (
     <AppShell user={user} links={CLOSER_LINKS}>
@@ -46,7 +48,7 @@ export default async function CloserPortalPage() {
         ) : (
           <ul className="divide-y divide-slate-100">
             {rows.map((agent) => (
-              <CloserAgentRow key={agent.id} agent={agent} />
+              <CloserAgentRow key={agent.id} agent={agent} photo={photos.get(agent.name)} />
             ))}
           </ul>
         )}

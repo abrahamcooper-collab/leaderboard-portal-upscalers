@@ -82,24 +82,38 @@ export async function updateCloser(_state: ActionState, formData: FormData): Pro
   return success("Saved.");
 }
 
-const resetPasswordSchema = z.object({ teamId: field.id, password: field.password });
+const closerLoginSchema = z.object({
+  teamId: field.id,
+  email: field.email,
+  // Blank keeps the current password.
+  password: z.union([z.literal(""), field.password]).transform((value) => value || undefined),
+});
 
-export async function resetCloserPassword(
-  _state: ActionState,
-  formData: FormData,
-): Promise<ActionState> {
+/** Changes the closer's login email and, if one is given, their password. Both take effect immediately. */
+export async function updateCloserLogin(_state: ActionState, formData: FormData): Promise<ActionState> {
   await requireAdmin();
-  const parsed = resetPasswordSchema.safeParse(Object.fromEntries(formData));
+  const parsed = closerLoginSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return invalid(parsed.error);
+  const { teamId, email, password } = parsed.data;
 
-  const closerId = await findCloserId(parsed.data.teamId);
+  const closerId = await findCloserId(teamId);
   if (!closerId) return failure("Team not found.");
 
+  // Set by an admin, so the new address is marked confirmed: no verification email, works straight away.
   const { error } = await createAdminClient().auth.admin.updateUserById(closerId, {
-    password: parsed.data.password,
+    email,
+    email_confirm: true,
+    ...(password && { password }),
   });
-  if (error) return unexpected(`resetCloserPassword ${closerId}`, error);
-  return success("Password updated. Share it with the closer.");
+  if (error) {
+    if (error.code === "email_exists") return failure("Another login already uses this email.");
+    return unexpected(`updateCloserLogin ${closerId}`, error);
+  }
+
+  revalidateApp();
+  return success(
+    password ? "Login updated. Share the new email and password with the closer." : "Login email updated.",
+  );
 }
 
 const teamIdSchema = z.object({ teamId: field.id });

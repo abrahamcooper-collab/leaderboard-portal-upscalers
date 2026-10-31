@@ -1,12 +1,15 @@
 "use client";
 
-import { useCallback, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
 import { videoPublicUrl } from "@/lib/supabase/storage";
 import { CelebrationOverlay, type Celebration } from "./celebration-overlay";
 import { useLiveSales, type SaleRow } from "./use-live-sales";
 import { usePreloadedVideos } from "./use-preloaded-videos";
+
+// The TV controls fade out once the mouse has been still this long, so they don't sit on the board.
+const CONTROLS_IDLE_MS = 4_000;
 
 /**
  * Keeps a TV board live (the Sales Floor, or the slideshow): every sale insert
@@ -34,6 +37,7 @@ export function LiveBoard({
 
   const finishCurrent = useCallback(() => setQueue((current) => current.slice(1)), []);
   const current = queue[0];
+  const showControls = useRecentActivity(CONTROLS_IDLE_MS);
 
   return (
     <>
@@ -47,7 +51,12 @@ export function LiveBoard({
           onDone={finishCurrent}
         />
       )}
-      <div className="fixed bottom-4 right-4 z-40 flex gap-2">
+      {/* Shown on any mouse or key activity; keyboard focus keeps them visible. */}
+      <div
+        className={`fixed bottom-4 right-4 z-40 flex gap-2 transition-opacity duration-500 focus-within:pointer-events-auto focus-within:opacity-100 ${
+          showControls ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
+      >
         {!soundOn && (
           <BoardButton onClick={() => setSoundOn(true)}>Enable sound</BoardButton>
         )}
@@ -57,6 +66,26 @@ export function LiveBoard({
       </div>
     </>
   );
+}
+
+/** True while there has been pointer or keyboard activity within the last `idleMs`. */
+function useRecentActivity(idleMs: number): boolean {
+  const [isActive, setIsActive] = useState(true);
+  useEffect(() => {
+    let timeout = setTimeout(() => setIsActive(false), idleMs);
+    const wake = () => {
+      setIsActive(true);
+      clearTimeout(timeout);
+      timeout = setTimeout(() => setIsActive(false), idleMs);
+    };
+    const events = ["pointermove", "pointerdown", "keydown"] as const;
+    events.forEach((event) => window.addEventListener(event, wake, { passive: true }));
+    return () => {
+      clearTimeout(timeout);
+      events.forEach((event) => window.removeEventListener(event, wake));
+    };
+  }, [idleMs]);
+  return isActive;
 }
 
 function BoardButton({ onClick, children }: { onClick: () => void; children: string }) {

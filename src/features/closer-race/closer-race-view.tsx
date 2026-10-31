@@ -17,7 +17,7 @@ export function CloserRaceView({
   monthLabel: string;
 }) {
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-3">
       <header className="text-center">
         <p className="text-xs font-extrabold uppercase tracking-[0.35em] text-sky-400">
           Creative Giants · Operations Closeout · {monthLabel}
@@ -28,7 +28,7 @@ export function CloserRaceView({
         <p className="mt-2 text-slate-400">
           {runners.length} {runners.length === 1 ? "closer" : "closers"}. One target. Every deal moves you closer to the crown.
         </p>
-        <ul className="mt-4 flex flex-wrap justify-center gap-3 text-sm">
+        <ul className="mt-3 flex flex-wrap justify-center gap-3 text-sm">
           <Stat icon="🎯" label="Team target" value={formatUsd(summary.teamTarget)} />
           {summary.perCloserTarget !== null && (
             <Stat icon="🏁" label="Per closer" value={formatUsd(summary.perCloserTarget)} />

@@ -1,6 +1,8 @@
+import type { StaticImageData } from "next/image";
 import type { CSSProperties } from "react";
 import { targetProgress, type AgentStanding, type TeamStanding } from "@/features/leaderboard/model";
 import { agentAvatarSrc, closerAvatarSrc } from "@/features/teams/avatars";
+import { matchTeamPhotos } from "@/features/teams/roster-photos";
 import { TEAM_COLORS } from "@/features/teams/team-colors";
 import { Avatar } from "./avatar";
 import { Crown } from "./crown";
@@ -38,6 +40,7 @@ export function TeamPanel({ team, rowCount }: { team: TeamStanding; rowCount: nu
     "--team-line": `color-mix(in srgb, ${accent} 45%, transparent)`,
   } as CSSProperties;
   const emptyRows = Math.max(rowCount - team.agents.length, 0);
+  const photos = matchTeamPhotos(team.name, team.agents.map((agent) => agent.name)).byAgent;
 
   return (
     <section
@@ -55,10 +58,11 @@ export function TeamPanel({ team, rowCount }: { team: TeamStanding; rowCount: nu
 
       <table className="h-full w-full flex-1 table-fixed border-collapse">
         <colgroup>
-          <col className="w-[42%]" />
-          <col className="w-[22%]" />
+          {/* Names get the most room: full names like "Johnson Nikeulei" must fit on a laptop-size screen. */}
+          <col className="w-[49%]" />
           <col className="w-[20%]" />
-          <col className="w-[16%]" />
+          <col className="w-[17%]" />
+          <col className="w-[14%]" />
         </colgroup>
         <thead className="bg-[var(--team-accent)] font-[family-name:var(--font-condensed)] text-[clamp(0.8rem,min(1.05vw,1.8vh),1.15rem)] uppercase tracking-wide text-[var(--team-on-accent)]">
           <tr>
@@ -70,7 +74,7 @@ export function TeamPanel({ team, rowCount }: { team: TeamStanding; rowCount: nu
         </thead>
         <tbody className={`font-[family-name:var(--font-chalk)] text-white ${ROW_TEXT}`}>
           {team.agents.map((agent) => (
-            <AgentRow key={agent.id} agent={agent} teamName={team.name} />
+            <AgentRow key={agent.id} agent={agent} photo={photos.get(agent.name)} />
           ))}
           {Array.from({ length: emptyRows }, (_, index) => (
             <tr key={`empty-${index}`} className="border-t border-[var(--team-line)]">
@@ -97,14 +101,14 @@ export function TeamPanel({ team, rowCount }: { team: TeamStanding; rowCount: nu
   );
 }
 
-function AgentRow({ agent, teamName }: { agent: AgentStanding; teamName: string }) {
+function AgentRow({ agent, photo }: { agent: AgentStanding; photo: StaticImageData | undefined }) {
   const hitTarget = targetProgress(agent.salesTotal, agent.target) === 1;
 
   return (
     <tr className={`border-t border-[var(--team-line)] ${agent.archived ? "opacity-45" : ""}`}>
       <td className={CELL}>
         <span className="flex min-w-0 items-center gap-2.5">
-          <Avatar name={agent.name} src={agentAvatarSrc(teamName, agent.name, agent.avatarPath)} size={28} />
+          <Avatar name={agent.name} src={agentAvatarSrc(agent.avatarPath, photo)} size={28} />
           <span className="truncate uppercase">{agent.name}</span>
           {agent.archived && <span className="shrink-0 text-[0.65em] normal-case text-white/60">(removed)</span>}
         </span>

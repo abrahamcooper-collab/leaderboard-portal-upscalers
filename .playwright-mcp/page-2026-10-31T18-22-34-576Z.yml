@@ -1,0 +1,192 @@
+- generic [active] [ref=f1e1]:
+  - generic [ref=f1e2]:
+    - banner [ref=f1e3]:
+      - generic [ref=f1e4]:
+        - navigation [ref=f1e5]:
+          - generic [ref=f1e6]: Sales Portal
+          - link "Sales" [ref=f1e7] [cursor=pointer]:
+            - /url: /admin/sales
+          - link "Teams" [ref=f1e8] [cursor=pointer]:
+            - /url: /admin/teams
+          - link "Sales Floor" [ref=f1e9] [cursor=pointer]:
+            - /url: /sales-floor
+          - link "Operations Closeout" [ref=f1e10] [cursor=pointer]:
+            - /url: /operations-closeout
+          - link "Page 3" [ref=f1e11] [cursor=pointer]:
+            - /url: /page-3
+          - link "Page 4" [ref=f1e12] [cursor=pointer]:
+            - /url: /page-4
+        - generic [ref=f1e13]:
+          - link "▶ Slideshow" [ref=f1e14] [cursor=pointer]:
+            - /url: /slideshow
+          - generic [ref=f1e15]:
+            - text: Admin Name
+            - button "Sign out" [ref=f1e16]
+    - main [ref=f1e17]:
+      - generic [ref=f1e18]:
+        - heading "Team Bill" [level=1] [ref=f1e19]
+        - link "← All teams" [ref=f1e20] [cursor=pointer]:
+          - /url: /admin/teams
+      - generic [ref=f1e21]:
+        - generic [ref=f1e22]:
+          - heading "Closer and team" [level=2] [ref=f1e23]
+          - generic [ref=f1e25]:
+            - generic [ref=f1e26]:
+              - text: Closer name
+              - textbox "Closer name" [ref=f1e27]: Bill Anderson
+            - generic [ref=f1e28]:
+              - text: Closer phone
+              - textbox "Closer phone" [ref=f1e29]: "9292242482"
+            - generic [ref=f1e30]:
+              - text: Team name
+              - textbox "Team name" [ref=f1e31]: Team Bill
+            - generic [ref=f1e32]:
+              - text: Sales Floor colour
+              - combobox "Sales Floor colour" [ref=f1e33]:
+                - option "Gray"
+                - option "Electric cyan" [selected]
+                - option "Gold"
+                - option "Red"
+                - option "Blue"
+                - option "Green"
+                - option "Purple"
+            - button "Save" [ref=f1e35]
+        - generic [ref=f1e36]:
+          - heading "Agents · October 2026" [level=2] [ref=f1e37]
+          - paragraph [ref=f1e38]: A target carries over to later months until you change it.
+          - generic [ref=f1e39]:
+            - list [ref=f1e40]:
+              - listitem [ref=f1e41]:
+                - generic [ref=f1e42]:
+                  - img "Henry Miller" [ref=f1e43]
+                  - paragraph [ref=f1e44]: "This month: $0 from 0 sales · target $2,000"
+                - generic [ref=f1e45]:
+                  - generic [ref=f1e46]:
+                    - text: Name
+                    - textbox "Name" [ref=f1e47]: Henry Miller
+                  - generic [ref=f1e48]:
+                    - text: Phone
+                    - textbox "Phone" [ref=f1e49]: "123"
+                  - generic [ref=f1e50]:
+                    - text: Monthly target ($)
+                    - spinbutton "Monthly target ($)" [ref=f1e51]: "2000"
+                  - button "Save" [ref=f1e53]
+                - button "Remove agent" [ref=f1e56]
+              - listitem [ref=f1e57]:
+                - generic [ref=f1e58]:
+                  - img "Joe Bell" [ref=f1e59]
+                  - paragraph [ref=f1e60]: "This month: $0 from 0 sales · target $1,000"
+                - generic [ref=f1e61]:
+                  - generic [ref=f1e62]:
+                    - text: Name
+                    - textbox "Name" [ref=f1e63]: Joe Bell
+                  - generic [ref=f1e64]:
+                    - text: Phone
+                    - textbox "Phone" [ref=f1e65]: "999999999"
+                  - generic [ref=f1e66]:
+                    - text: Monthly target ($)
+                    - spinbutton "Monthly target ($)" [ref=f1e67]: "1000"
+                  - button "Save" [ref=f1e69]
+                - button "Remove agent" [ref=f1e72]
+              - listitem [ref=f1e73]:
+                - generic [ref=f1e74]:
+                  - img "Johnson Nikeulei" [ref=f1e75]
+                  - paragraph [ref=f1e76]: "This month: $0 from 0 sales"
+                - generic [ref=f1e77]:
+                  - generic [ref=f1e78]:
+                    - text: Name
+                    - textbox "Name" [ref=f1e79]: Johnson Nikeulei
+                  - generic [ref=f1e80]:
+                    - text: Phone
+                    - textbox "Phone" [ref=f1e81]
+                  - generic [ref=f1e82]:
+                    - text: Monthly target ($)
+                    - spinbutton "Monthly target ($)" [ref=f1e83]
+                  - button "Save" [ref=f1e85]
+                - button "Remove agent" [ref=f1e88]
+              - listitem [ref=f1e89]:
+                - generic [ref=f1e90]:
+                  - img "Kevin Wilson" [ref=f1e91]
+                  - paragraph [ref=f1e92]: "This month: $0 from 0 sales · target $2,000"
+                - generic [ref=f1e93]:
+                  - generic [ref=f1e94]:
+                    - text: Name
+                    - textbox "Name" [ref=f1e95]: Kevin Wilson
+                  - generic [ref=f1e96]:
+                    - text: Phone
+                    - textbox "Phone" [ref=f1e97]: "123123"
+                  - generic [ref=f1e98]:
+                    - text: Monthly target ($)
+                    - spinbutton "Monthly target ($)" [ref=f1e99]: "2000"
+                  - button "Save" [ref=f1e101]
+                - button "Remove agent" [ref=f1e104]
+              - listitem [ref=f1e105]:
+                - generic [ref=f1e106]:
+                  - img "Peter Lane" [ref=f1e107]
+                  - paragraph [ref=f1e108]: "This month: $0 from 0 sales · target $2,000"
+                - generic [ref=f1e109]:
+                  - generic [ref=f1e110]:
+                    - text: Name
+                    - textbox "Name" [ref=f1e111]: Peter Lane
+                  - generic [ref=f1e112]:
+                    - text: Phone
+                    - textbox "Phone" [ref=f1e113]: "12234434"
+                  - generic [ref=f1e114]:
+                    - text: Monthly target ($)
+                    - spinbutton "Monthly target ($)" [ref=f1e115]: "2000"
+                  - button "Save" [ref=f1e117]
+                - button "Remove agent" [ref=f1e120]
+              - listitem [ref=f1e121]:
+                - generic [ref=f1e122]:
+                  - img "Sean Parker" [ref=f1e123]
+                  - paragraph [ref=f1e124]: "This month: $0 from 0 sales · target $2,000"
+                - generic [ref=f1e125]:
+                  - generic [ref=f1e126]:
+                    - text: Name
+                    - textbox "Name" [ref=f1e127]: Sean Parker
+                  - generic [ref=f1e128]:
+                    - text: Phone
+                    - textbox "Phone" [ref=f1e129]: "123"
+                  - generic [ref=f1e130]:
+                    - text: Monthly target ($)
+                    - spinbutton "Monthly target ($)" [ref=f1e131]: "2000"
+                  - button "Save" [ref=f1e133]
+                - button "Remove agent" [ref=f1e136]
+            - generic [ref=f1e137]:
+              - heading "Add an agent" [level=3] [ref=f1e138]
+              - generic [ref=f1e139]:
+                - generic [ref=f1e140]:
+                  - text: Name
+                  - textbox "Name" [ref=f1e141]
+                - generic [ref=f1e142]:
+                  - text: Phone
+                  - textbox "Phone" [ref=f1e143]
+                - generic [ref=f1e144]:
+                  - text: Monthly target ($)
+                  - spinbutton "Monthly target ($)" [ref=f1e145]
+                - button "Add agent" [ref=f1e147]
+        - generic [ref=f1e148]:
+          - heading "Celebration video" [level=2] [ref=f1e149]
+          - paragraph [ref=f1e150]: Plays full screen on the leaderboard when this team makes a sale. MP4 or WebM, up to 50 MB.
+          - generic [ref=f1e152]:
+            - generic [ref=f1e154]:
+              - button "Choose File" [ref=f1e155]
+              - button "Replace video" [disabled] [ref=f1e156]
+            - button "Remove video" [ref=f1e159]
+        - generic [ref=f1e160]:
+          - heading "Closer login" [level=2] [ref=f1e161]
+          - paragraph [ref=f1e162]: Change the email and password the closer signs in with. Both work straight away.
+          - generic [ref=f1e164]:
+            - generic [ref=f1e165]:
+              - text: Login email
+              - textbox "Login email" [ref=f1e166]: bill.a@businessupscalersllc.com
+            - generic [ref=f1e167]:
+              - text: New password (leave blank to keep)
+              - textbox "New password (leave blank to keep)" [ref=f1e168]
+            - button "Save login" [ref=f1e170]
+        - generic [ref=f1e171]:
+          - heading "Remove closer" [level=2] [ref=f1e172]
+          - paragraph [ref=f1e173]: Disables their login and takes the team off the leaderboard. Sales are kept.
+          - button "Remove closer and team" [ref=f1e177]
+  - button "Open Next.js Dev Tools" [ref=f1e183] [cursor=pointer]
+  - alert [ref=f1e187]

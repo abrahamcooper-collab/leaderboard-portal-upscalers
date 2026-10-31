@@ -1,0 +1,115 @@
+- generic [active] [ref=f67e1]:
+  - generic [ref=f67e2]:
+    - banner [ref=f67e3]:
+      - generic [ref=f67e4]:
+        - navigation [ref=f67e5]:
+          - generic [ref=f67e6]: Sales Portal
+          - link "My team" [ref=f67e7] [cursor=pointer]:
+            - /url: /portal
+          - link "Sales Floor" [ref=f67e8] [cursor=pointer]:
+            - /url: /sales-floor
+          - link "Operations Closeout" [ref=f67e9] [cursor=pointer]:
+            - /url: /operations-closeout
+          - link "Page 3" [ref=f67e10] [cursor=pointer]:
+            - /url: /page-3
+          - link "Page 4" [ref=f67e11] [cursor=pointer]:
+            - /url: /page-4
+        - generic [ref=f67e12]:
+          - link "▶ Slideshow" [ref=f67e13] [cursor=pointer]:
+            - /url: /slideshow
+          - generic [ref=f67e14]:
+            - text: Bill Anderson
+            - button "Sign out" [ref=f67e15]
+    - main [ref=f67e16]:
+      - heading "Team Bill" [level=1] [ref=f67e18]
+      - generic [ref=f67e19]:
+        - generic [ref=f67e20]:
+          - paragraph [ref=f67e21]: Rank
+          - paragraph [ref=f67e22]: "#1 of 3"
+        - generic [ref=f67e23]:
+          - paragraph [ref=f67e24]: Sales · October 2026
+          - paragraph [ref=f67e25]: $0
+        - generic [ref=f67e26]:
+          - paragraph [ref=f67e27]: Number of sales
+          - paragraph [ref=f67e28]: "0"
+        - generic [ref=f67e29]:
+          - paragraph [ref=f67e30]: Team target
+          - paragraph [ref=f67e31]: $9,000
+      - generic [ref=f67e32]:
+        - heading "Agents" [level=2] [ref=f67e33]
+        - paragraph [ref=f67e34]: You can update agents' names and phone numbers. Targets are set by an admin.
+        - list [ref=f67e36]:
+          - listitem [ref=f67e37]:
+            - generic [ref=f67e38]:
+              - img "Henry Miller" [ref=f67e39]
+              - paragraph [ref=f67e40]: "This month: $0 from 0 sales · target $2,000"
+            - generic [ref=f67e41]:
+              - generic [ref=f67e42]:
+                - text: Name
+                - textbox "Name" [ref=f67e43]: Henry Miller
+              - generic [ref=f67e44]:
+                - text: Phone
+                - textbox "Phone" [ref=f67e45]: "123"
+              - button "Save" [ref=f67e47]
+          - listitem [ref=f67e48]:
+            - generic [ref=f67e49]:
+              - img "Joe Bell" [ref=f67e50]
+              - paragraph [ref=f67e51]: "This month: $0 from 0 sales · target $1,000"
+            - generic [ref=f67e52]:
+              - generic [ref=f67e53]:
+                - text: Name
+                - textbox "Name" [ref=f67e54]: Joe Bell
+              - generic [ref=f67e55]:
+                - text: Phone
+                - textbox "Phone" [ref=f67e56]: "999999999"
+              - button "Save" [ref=f67e58]
+          - listitem [ref=f67e59]:
+            - generic [ref=f67e60]:
+              - img "Johnson Nikeulei" [ref=f67e61]
+              - paragraph [ref=f67e62]: "This month: $0 from 0 sales"
+            - generic [ref=f67e63]:
+              - generic [ref=f67e64]:
+                - text: Name
+                - textbox "Name" [ref=f67e65]: Johnson Nikeulei
+              - generic [ref=f67e66]:
+                - text: Phone
+                - textbox "Phone" [ref=f67e67]
+              - button "Save" [ref=f67e69]
+          - listitem [ref=f67e70]:
+            - generic [ref=f67e71]:
+              - img "Kevin Wilson" [ref=f67e72]
+              - paragraph [ref=f67e73]: "This month: $0 from 0 sales · target $2,000"
+            - generic [ref=f67e74]:
+              - generic [ref=f67e75]:
+                - text: Name
+                - textbox "Name" [ref=f67e76]: Kevin Wilson
+              - generic [ref=f67e77]:
+                - text: Phone
+                - textbox "Phone" [ref=f67e78]: "123123"
+              - button "Save" [ref=f67e80]
+          - listitem [ref=f67e81]:
+            - generic [ref=f67e82]:
+              - img "Peter Lane" [ref=f67e83]
+              - paragraph [ref=f67e84]: "This month: $0 from 0 sales · target $2,000"
+            - generic [ref=f67e85]:
+              - generic [ref=f67e86]:
+                - text: Name
+                - textbox "Name" [ref=f67e87]: Peter Lane
+              - generic [ref=f67e88]:
+                - text: Phone
+                - textbox "Phone" [ref=f67e89]: "12234434"
+              - button "Save" [ref=f67e91]
+          - listitem [ref=f67e92]:
+            - generic [ref=f67e93]:
+              - img "Sean Parker" [ref=f67e94]
+              - paragraph [ref=f67e95]: "This month: $0 from 0 sales · target $2,000"
+            - generic [ref=f67e96]:
+              - generic [ref=f67e97]:
+                - text: Name
+                - textbox "Name" [ref=f67e98]: Sean Parker
+              - generic [ref=f67e99]:
+                - text: Phone
+                - textbox "Phone" [ref=f67e100]: "123"
+              - button "Save" [ref=f67e102]
+  - button "Open Next.js Dev Tools" [ref=f67e108] [cursor=pointer]
+  - alert [ref=f67e112]

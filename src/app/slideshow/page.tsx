@@ -8,6 +8,7 @@ import { getRecentSalesByTeam } from "@/features/sales/queries";
 import { SalesFloorScreen } from "@/features/sales-floor/sales-floor-screen";
 import { SalesFloorView } from "@/features/sales-floor/sales-floor-view";
 import { AlternatingImage } from "@/features/slideshow/alternating-image";
+import { FitToScreen } from "@/features/slideshow/fit-to-screen";
 import { FullScreenImage } from "@/features/slideshow/full-screen-image";
 import { PAGE_3_IMAGE, PAGE_4_IMAGES } from "@/features/slideshow/images";
 import { Slideshow, type Slide } from "@/features/slideshow/slideshow";
@@ -43,18 +44,22 @@ export default async function SlideshowPage() {
       id: "sales-floor",
       durationMs: BOARD_SLIDE_MS,
       content: (
-        <SalesFloorScreen>
-          <SalesFloorView standings={standings} monthLabel={monthLabel} />
-        </SalesFloorScreen>
+        <FitToScreen background="#070707">
+          <SalesFloorScreen>
+            <SalesFloorView standings={standings} monthLabel={monthLabel} />
+          </SalesFloorScreen>
+        </FitToScreen>
       ),
     },
     {
       id: "operations-closeout",
       durationMs: BOARD_SLIDE_MS,
       content: (
-        <CloserRaceScreen>
-          <CloserRaceView runners={runners} summary={summarizeRace(runners)} recentSalesByTeam={recentSalesByTeam} monthLabel={monthLabel} />
-        </CloserRaceScreen>
+        <FitToScreen background="#0b1120">
+          <CloserRaceScreen>
+            <CloserRaceView runners={runners} summary={summarizeRace(runners)} recentSalesByTeam={recentSalesByTeam} monthLabel={monthLabel} />
+          </CloserRaceScreen>
+        </FitToScreen>
       ),
     },
     { id: "page-3", durationMs: PICTURE_SLIDE_MS, content: <FullScreenImage src={PAGE_3_IMAGE} alt="Creative Giants" /> },

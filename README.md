@@ -10,7 +10,7 @@ celebration video whenever an admin records a sale.
 - **Page 3** (`/page-3`) is one full-screen picture, from `public/images/Page3/`.
 - **Page 4** (`/page-4`) is one of two full-screen pictures from `public/images/page4/`, the other one on each visit.
 - **Slideshow** (`/slideshow`, the ▶ Slideshow button in the header) loops Sales Floor → Operations Closeout → Page 3 → Page 4 with a slow cross-fade. It stays live: sales update the numbers and play their celebration over whatever is showing. Slide times are at the top of `src/app/slideshow/page.tsx`.
-- **Photos** of closers and agents come from `public/images/team*/`. A closer's photo is matched by team, an agent's by team and name. The list is in `src/features/teams/roster-photos.ts`.
+- **Photos** of closers and agents come from `public/images/team*/`, listed in `src/features/teams/roster-photos.ts`. A closer's photo is matched by team. An agent's is matched by name within their team, allowing a first name only ("Henry" → Henry Miller) and small spelling differences ("Shawn" → Sean). A team's admin page shows each agent's photo and lists any photos no agent matched.
 
 Stack: Next.js 16 (App Router, Server Actions), Tailwind CSS v4, Supabase (Postgres, Auth, Realtime, Storage), deployed on Vercel.
 

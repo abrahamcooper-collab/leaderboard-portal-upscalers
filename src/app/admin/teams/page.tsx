@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Card, PageHeader } from "@/components/ui";
 import { getStandings } from "@/features/leaderboard/queries";
+import { Avatar } from "@/features/sales-floor/avatar";
+import { closerAvatarSrc } from "@/features/teams/avatars";
 import { CreateCloserForm } from "@/features/teams/closer-forms";
 import { listTeams } from "@/features/teams/queries";
 import { requireAdmin } from "@/lib/auth";
@@ -28,12 +30,15 @@ export default async function AdminTeamsPage() {
                       href={`/admin/teams/${team.id}`}
                       className="-mx-2 flex flex-wrap items-center justify-between gap-2 rounded-md px-2 py-3 hover:bg-slate-50"
                     >
-                      <div>
-                        <p className="font-medium text-slate-900">{team.name}</p>
-                        <p className="text-sm text-slate-500">
-                          {team.closerName}
-                          {team.closerPhone && <> · {team.closerPhone}</>}
-                        </p>
+                      <div className="flex items-center gap-3">
+                        <Avatar name={team.closerName} src={closerAvatarSrc(team.name, standing?.closerAvatarPath ?? null)} size={40} />
+                        <div>
+                          <p className="font-medium text-slate-900">{team.name}</p>
+                          <p className="text-sm text-slate-500">
+                            {team.closerName}
+                            {team.closerPhone && <> · {team.closerPhone}</>}
+                          </p>
+                        </div>
                       </div>
                       <p className="text-sm text-slate-500">
                         {standing?.agents.filter((agent) => !agent.archived).length ?? 0} agents · this month{" "}
