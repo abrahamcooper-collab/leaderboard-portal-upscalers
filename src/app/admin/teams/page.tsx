@@ -31,7 +31,7 @@ export default async function AdminTeamsPage() {
                       className="-mx-2 flex flex-wrap items-center justify-between gap-2 rounded-md px-2 py-3 hover:bg-slate-50"
                     >
                       <div className="flex items-center gap-3">
-                        <Avatar name={team.closerName} src={closerAvatarSrc(team.name, standing?.closerAvatarPath ?? null)} size={40} />
+                        <Avatar name={team.closerName} src={closerAvatarSrc(team.name, standing?.closerAvatarPath ?? null)} size={40} tone="light" />
                         <div>
                           <p className="font-medium text-slate-900">{team.name}</p>
                           <p className="text-sm text-slate-500">

@@ -31,7 +31,8 @@ export function RunnerFace({
         height={size}
         // Same rule as the Sales Floor avatar: resize bundled photos, not uploads.
         unoptimized={typeof src === "string"}
-        className={`${className} object-cover`}
+        // Top-anchored like the Sales Floor avatars, so a portrait photo keeps the whole head.
+        className={`${className} object-cover object-top`}
         style={style}
       />
     );

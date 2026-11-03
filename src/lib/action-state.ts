@@ -29,3 +29,8 @@ export function unexpected(context: string, error: { message: string }): ActionS
   console.error(`[action] ${context}: ${error.message}`);
   return failure("Something went wrong. Please try again.");
 }
+
+/** Postgres "insufficient privilege": a row-level security policy refused the write. */
+export function isPermissionDenied(error: { code?: string } | null): boolean {
+  return error?.code === "42501";
+}

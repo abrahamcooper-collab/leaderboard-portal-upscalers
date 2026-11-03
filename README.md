@@ -4,7 +4,7 @@ Tracks sales for closers' teams and shows a live leaderboard that plays a
 celebration video whenever an admin records a sale.
 
 - **Admins** manage closers, teams, agents, monthly targets and videos, and record sales.
-- **Closers** see their team's stats and can rename agents or change their phone numbers.
+- **Closers** see their team's stats, record sales for their own agents, set their agents' monthly targets, and can rename agents or change their phone numbers. Adding or removing agents stays with admins.
 - **The Sales Floor** (`/sales-floor`) is built for a TV. It updates live and celebrates each new sale.
 - **Operations Closeout** (`/operations-closeout`) is the closer race: each closer runs toward their team target, with their photo as the runner's face. A closer with no sales this month stands at the start; anyone with a sale is always running. After a team's sale, its runner moves forward for 10 minutes, covering the new distance in exactly that time, with quicker legs for a bigger sale.
 - **Page 3** (`/page-3`) is one full-screen picture, from `public/images/Page3/`.
@@ -39,6 +39,7 @@ Stack: Next.js 16 (App Router, Server Actions), Tailwind CSS v4, Supabase (Postg
    2. `20261028010000_archive_instead_of_delete.sql`
    3. `20261031000000_sales_floor.sql`
    4. `20261031010000_closer_moods.sql`
+   5. `20261103000000_closer_targets_and_sales.sql`
 
 ### 2. Create the first admin
 

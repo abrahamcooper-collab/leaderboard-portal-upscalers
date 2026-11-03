@@ -11,7 +11,7 @@
 import type { StaticImageData } from "next/image";
 import { teamKey } from "./team-order";
 
-import billCloser from "../../../public/images/teambill/team-bill-anderson(closer).png";
+import billCloser from "../../../public/images/teambill/team-bill-anderson(closer).jpeg";
 import billHenry from "../../../public/images/teambill/team-bill-henry.png";
 import billJoeBell from "../../../public/images/teambill/team-bill-joe-bell.png";
 import billJohnsonNikeulei from "../../../public/images/teambill/team-bill-johnson-nikeulei.png";

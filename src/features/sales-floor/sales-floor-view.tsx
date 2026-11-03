@@ -25,8 +25,8 @@ export function SalesFloorView({
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-[min(1.5rem,2vh)]">
       <header className="grid shrink-0 grid-cols-1 items-center gap-6 md:grid-cols-[1fr_2fr_1fr]">
-        {/* Cropped above the logo's tagline; the soft mask hides the image's square edge. */}
-        <div className="relative mx-auto aspect-[1254/960] w-[clamp(8rem,min(13vw,22vh),14rem)] overflow-hidden [mask-image:radial-gradient(ellipse_at_center,black_62%,transparent_80%)] md:mx-0">
+        {/* Cropped above the logo's tagline. */}
+        <div className="relative mx-auto aspect-[1254/960] w-[clamp(8rem,min(13vw,22vh),14rem)] overflow-hidden md:mx-0">
           <Image src={logo} alt="Creative Giants" fill preload sizes="14rem" className="object-cover object-top" />
         </div>
 

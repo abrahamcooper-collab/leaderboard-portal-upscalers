@@ -3,6 +3,7 @@ import { Card, PageHeader } from "@/components/ui";
 import { CloserAgentRow } from "@/features/agents/agent-forms";
 import { toAgentRows } from "@/features/agents/agent-rows";
 import { getStandings } from "@/features/leaderboard/queries";
+import { RecordSaleForm } from "@/features/sales/sale-forms";
 import { matchTeamPhotos } from "@/features/teams/roster-photos";
 import { getTeamIdForCloser, listAgentContacts } from "@/features/teams/queries";
 import { requireCloser } from "@/lib/auth";
@@ -42,7 +43,15 @@ export default async function CloserPortalPage() {
         <Stat label="Number of sales" value={String(team?.salesCount ?? 0)} />
         <Stat label="Team target" value={team?.target ? formatUsd(team.target) : "—"} />
       </div>
-      <Card title="Agents" description="You can update agents' names and phone numbers. Targets are set by an admin.">
+      <div className="mb-6">
+        <Card title="Record a sale" description="It goes on the boards straight away and plays your team's celebration video.">
+          <RecordSaleForm teams={[{ id: teamId, name: team?.name ?? "My team", agents }]} />
+        </Card>
+      </div>
+      <Card
+        title={`Agents · ${formatMonth(currentMonth())}`}
+        description="Update names, phone numbers and this month's targets. A target carries over to later months until you change it."
+      >
         {rows.length === 0 ? (
           <p className="text-sm text-slate-500">No agents yet. An admin adds agents to your team.</p>
         ) : (

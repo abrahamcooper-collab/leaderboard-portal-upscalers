@@ -4,10 +4,10 @@ import { formatUsdExact } from "@/lib/money";
 import { deleteSale, recordSale } from "./actions";
 import type { RecentSale, SaleTeamOption } from "./queries";
 
-/** Pick the agent (grouped by team) and the amount; the team follows from the agent. */
+/** Pick the agent (grouped by team) and the amount; the team follows from the agent. Used by admins (every team) and closers (their own). */
 export function RecordSaleForm({ teams }: { teams: readonly SaleTeamOption[] }) {
-  if (teams.length === 0) {
-    return <p className="text-sm text-slate-500">Add a closer and at least one agent before recording sales.</p>;
+  if (teams.every((team) => team.agents.length === 0)) {
+    return <p className="text-sm text-slate-500">There are no agents to record a sale for yet.</p>;
   }
 
   return (

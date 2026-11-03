@@ -3,7 +3,7 @@ import { ActionForm } from "@/components/action-form";
 import { Field, Input } from "@/components/ui";
 import { Avatar } from "@/features/sales-floor/avatar";
 import { formatUsd } from "@/lib/money";
-import { createAgent, removeAgent, updateAgentAsAdmin, updateAgentContact } from "./actions";
+import { createAgent, removeAgent, updateAgentAsAdmin, updateAgentAsCloser } from "./actions";
 
 export type AgentRowData = {
   id: string;
@@ -47,7 +47,7 @@ function TargetField({ target }: { target?: number | null }) {
 function AgentSummary({ agent, photo }: { agent: AgentRowData; photo: StaticImageData | undefined }) {
   return (
     <div className="flex items-center gap-3">
-      <Avatar name={agent.name} src={photo ?? null} size={36} />
+      <Avatar name={agent.name} src={photo ?? null} size={36} tone="light" />
       <p className="text-sm text-slate-500">
         This month: <span className="font-medium text-slate-900">{formatUsd(agent.salesTotal)}</span> from{" "}
         {agent.salesCount} {agent.salesCount === 1 ? "sale" : "sales"}
@@ -81,19 +81,15 @@ export function AdminAgentRow({ agent, photo }: { agent: AgentRowData; photo: St
   );
 }
 
-/** Closer: edit name and phone only. */
+/** Closer: edit name, phone and this month's target; adding and removing agents stays with admins. */
 export function CloserAgentRow({ agent, photo }: { agent: AgentRowData; photo: StaticImageData | undefined }) {
   return (
     <li className="flex flex-col gap-3 py-4">
       <AgentSummary agent={agent} photo={photo} />
-      <ActionForm
-        action={updateAgentContact}
-        submitLabel="Save"
-        variant="secondary"
-        className="grid items-end gap-3 sm:grid-cols-[1fr_1fr_auto]"
-      >
+      <ActionForm action={updateAgentAsCloser} submitLabel="Save" variant="secondary" className={ROW_FORM}>
         <input type="hidden" name="agentId" value={agent.id} />
         <ContactFields agent={agent} />
+        <TargetField target={agent.target} />
       </ActionForm>
     </li>
   );

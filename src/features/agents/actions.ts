@@ -1,8 +1,8 @@
 "use server";
 
 import { z } from "zod";
-import { failure, invalid, success, unexpected, type ActionState } from "@/lib/action-state";
-import { requireAdmin, requireUser } from "@/lib/auth";
+import { failure, invalid, isPermissionDenied, success, unexpected, type ActionState } from "@/lib/action-state";
+import { requireAdmin, requireCloser } from "@/lib/auth";
 import { currentMonth } from "@/lib/current-month";
 import * as field from "@/lib/form-schemas";
 import { revalidateApp } from "@/lib/revalidate";
@@ -67,20 +67,24 @@ export async function updateAgentAsAdmin(
   return success("Saved.");
 }
 
-const contactUpdateSchema = z.object({ agentId: field.id, ...contact });
+const closerUpdateSchema = z.object({ agentId: field.id, ...contact, target: optionalTarget });
 
-/** Closer edit: name and phone only. RLS limits closers to their own team's agents. */
-export async function updateAgentContact(
+/** Closer edit: name, phone and this month's target. RLS limits closers to their own team's agents. */
+export async function updateAgentAsCloser(
   _state: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
-  await requireUser();
-  const parsed = contactUpdateSchema.safeParse(Object.fromEntries(formData));
+  await requireCloser();
+  const parsed = closerUpdateSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return invalid(parsed.error);
-  const { agentId, name, phone } = parsed.data;
+  const { agentId, name, phone, target } = parsed.data;
 
   const contactError = await saveContact(agentId, { name, phone });
   if (contactError) return contactError;
+  if (target !== undefined) {
+    const targetError = await saveTarget(agentId, target);
+    if (targetError) return targetError;
+  }
 
   revalidateApp();
   return success("Saved.");
@@ -130,6 +134,8 @@ async function saveTarget(agentId: string, amount: number): Promise<ActionState 
   const { error } = await supabase
     .from("monthly_targets")
     .upsert({ agent_id: agentId, month: currentMonth(), amount });
+  // A closer setting a target for an agent outside their team.
+  if (isPermissionDenied(error)) return failure("You can only set targets for agents on your own team.");
   if (error) return unexpected(`saveTarget ${agentId}`, error);
   return null;
 }
