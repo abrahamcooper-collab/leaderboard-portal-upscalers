@@ -19,6 +19,9 @@ export type TeamDetail = TeamSummary & {
 
 export type AgentContact = { id: string; name: string; phone: string | null };
 
+/** What the boards need to celebrate a sale by this agent the instant it arrives. */
+export type AgentWithTeamVideo = { id: string; agentName: string; teamName: string; videoPath: string | null };
+
 const TEAM_COLUMNS =
   "id, name, color, closer_id, celebration_video_path, closer:profiles!teams_closer_id_fkey(full_name, phone)";
 
@@ -91,4 +94,34 @@ export async function listAgentContacts(teamId: string): Promise<AgentContact[]>
     .order("name");
   if (error) throw new Error(`Listing agents for team ${teamId} failed: ${error.message}`);
   return data;
+}
+
+/** Every active agent on an active team, with their team's name and celebration video. */
+export async function listCelebrationAgents(): Promise<AgentWithTeamVideo[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("agents")
+    .select("id, name, team:teams!inner(name, celebration_video_path, archived_at)")
+    .is("archived_at", null)
+    .is("team.archived_at", null);
+  if (error) throw new Error(`Listing agents for celebrations failed: ${error.message}`);
+  return data.map((agent) => ({
+    id: agent.id,
+    agentName: agent.name,
+    teamName: agent.team.name,
+    videoPath: agent.team.celebration_video_path,
+  }));
+}
+
+/** Whether the agent is on this closer's team (read access only, so it works before any write is allowed). */
+export async function isAgentOnClosersTeam(agentId: string, closerId: string): Promise<boolean> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("agents")
+    .select("id, team:teams!inner(closer_id)")
+    .eq("id", agentId)
+    .eq("team.closer_id", closerId)
+    .maybeSingle();
+  if (error) throw new Error(`Checking agent ${agentId} for closer ${closerId} failed: ${error.message}`);
+  return data !== null;
 }

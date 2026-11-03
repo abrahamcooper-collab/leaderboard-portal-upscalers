@@ -10,6 +10,9 @@ export type SaleRow = Database["public"]["Tables"]["sales"]["Row"];
 
 // Catches anything Realtime missed (e.g. the TV slept) and rolls the month over.
 const FALLBACK_REFRESH_MS = 5 * 60_000;
+// A new sale's data refresh waits this long, so re-rendering the page doesn't compete with its
+// celebration video starting. The board is hidden behind the video meanwhile anyway.
+const REFRESH_AFTER_SALE_MS = 3_000;
 
 type LiveSalesHandlers = {
   /** Runs for each new sale Realtime delivers. */
@@ -35,6 +38,7 @@ export function useLiveSales(channelName: string, handlers: LiveSalesHandlers = 
   useEffect(() => {
     const supabase = createClient();
     let hasSubscribed = false;
+    let pendingRefresh: ReturnType<typeof setTimeout> | undefined;
     const resume = () => {
       router.refresh();
       handlersRef.current.onResume?.(supabase);
@@ -43,8 +47,13 @@ export function useLiveSales(channelName: string, handlers: LiveSalesHandlers = 
     const channel = supabase
       .channel(channelName)
       .on<SaleRow>("postgres_changes", { event: "*", schema: "public", table: "sales" }, (payload) => {
-        router.refresh();
-        if (payload.eventType === "INSERT") handlersRef.current.onInsert?.(supabase, payload.new);
+        if (payload.eventType !== "INSERT") {
+          router.refresh();
+          return;
+        }
+        handlersRef.current.onInsert?.(supabase, payload.new);
+        clearTimeout(pendingRefresh);
+        pendingRefresh = setTimeout(() => router.refresh(), REFRESH_AFTER_SALE_MS);
       })
       .subscribe((status, error) => {
         if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
@@ -61,6 +70,7 @@ export function useLiveSales(channelName: string, handlers: LiveSalesHandlers = 
     document.addEventListener("visibilitychange", onVisible);
     const interval = setInterval(resume, FALLBACK_REFRESH_MS);
     return () => {
+      clearTimeout(pendingRefresh);
       clearInterval(interval);
       document.removeEventListener("visibilitychange", onVisible);
       supabase.removeChannel(channel);

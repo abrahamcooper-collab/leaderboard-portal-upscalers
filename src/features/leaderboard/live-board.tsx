@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
 import { videoPublicUrl } from "@/lib/supabase/storage";
-import { CelebrationOverlay, type Celebration } from "./celebration-overlay";
+import { CelebrationStage, type Celebration } from "./celebration-stage";
 import { useLiveSales, type SaleRow } from "./use-live-sales";
 import { usePreloadedVideos } from "./use-preloaded-videos";
 
@@ -15,24 +15,29 @@ const CONTROLS_IDLE_MS = 4_000;
 const CATCH_UP_WINDOW_MS = 10 * 60_000;
 const MAX_CATCH_UP = 3;
 
+/** An active agent, with what their sale's celebration shows. */
+export type CelebrationAgent = { id: string; agentName: string; teamName: string; videoUrl: string | null };
+
 /**
  * Keeps the TV pages live (see the boards layout): every new sale queues a
  * full-screen celebration over whatever is showing and re-fetches the page's
  * data. Each sale is celebrated once, whether it arrives live or is caught up
- * after a gap. `videoUrls` are all teams' celebration videos, downloaded up
- * front so they play instantly.
+ * after a gap. `agents` lets a sale's celebration start the moment it
+ * arrives, without a lookup; their teams' videos are downloaded and kept
+ * ready to play.
  */
-export function LiveBoard({
-  videoUrls,
-  children,
-}: {
-  videoUrls: readonly string[];
-  children: ReactNode;
-}) {
+export function LiveBoard({ agents, children }: { agents: readonly CelebrationAgent[]; children: ReactNode }) {
+  const videoUrls = [...new Set(agents.flatMap((agent) => (agent.videoUrl ? [agent.videoUrl] : [])))].sort();
   const preloadedVideos = usePreloadedVideos(videoUrls);
   const [queue, setQueue] = useState<Celebration[]>([]);
   // Browsers only allow video with sound after someone interacts with the page.
   const [soundOn, setSoundOn] = useState(false);
+
+  // The latest agents, for the Realtime callback (which outlives renders).
+  const agentsById = useRef(new Map<string, CelebrationAgent>());
+  useEffect(() => {
+    agentsById.current = new Map(agents.map((agent) => [agent.id, agent]));
+  }, [agents]);
 
   const celebratedSaleIds = useRef(new Set<string>());
   // Only sales after the board opened are celebrated; this moves forward as they arrive.
@@ -46,9 +51,13 @@ export function LiveBoard({
     if (celebratedSaleIds.current.has(sale.id)) return;
     celebratedSaleIds.current.add(sale.id);
     lastSaleAt.current = Math.max(lastSaleAt.current, Date.parse(sale.created_at));
-    loadCelebration(supabase, sale).then((celebration) => {
+    const enqueue = (celebration: Celebration | null) => {
       if (celebration) setQueue((current) => [...current, celebration]);
-    });
+    };
+    const agent = agentsById.current.get(sale.agent_id);
+    // Known agent: start straight away. An agent added since the page loaded needs one lookup.
+    if (agent) enqueue({ key: sale.id, amount: sale.amount, agentName: agent.agentName, teamName: agent.teamName, videoUrl: agent.videoUrl });
+    else loadCelebration(supabase, sale).then(enqueue);
   };
 
   useLiveSales("live-board", {
@@ -66,15 +75,13 @@ export function LiveBoard({
   return (
     <>
       {children}
-      {current && (
-        <CelebrationOverlay
-          key={current.key}
-          celebration={current}
-          videoSources={videoSourcesFor(current.videoUrl, preloadedVideos)}
-          soundOn={soundOn}
-          onDone={finishCurrent}
-        />
-      )}
+      <CelebrationStage
+        videoUrls={videoUrls}
+        sourcesFor={(videoUrl) => videoSourcesFor(videoUrl, preloadedVideos)}
+        current={current ?? null}
+        soundOn={soundOn}
+        onDone={finishCurrent}
+      />
       {/* Shown on any mouse or key activity; keyboard focus keeps them visible. */}
       <div
         className={`fixed bottom-4 right-4 z-40 flex gap-2 transition-opacity duration-500 focus-within:pointer-events-auto focus-within:opacity-100 ${
@@ -124,8 +131,7 @@ function BoardButton({ onClick, children }: { onClick: () => void; children: str
 }
 
 /** Where to play a team's video from, best first: the copy on this device, then streamed from Storage. */
-function videoSourcesFor(videoUrl: string | null, preloaded: ReadonlyMap<string, string>): string[] {
-  if (!videoUrl) return [];
+function videoSourcesFor(videoUrl: string, preloaded: ReadonlyMap<string, string>): string[] {
   const local = preloaded.get(videoUrl);
   return local ? [local, videoUrl] : [videoUrl];
 }

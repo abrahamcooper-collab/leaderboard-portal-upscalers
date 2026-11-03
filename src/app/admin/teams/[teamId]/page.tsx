@@ -65,7 +65,7 @@ export default async function AdminTeamPage({ params }: PageProps<"/admin/teams/
           </div>
         </Card>
 
-        <Card title="Celebration video" description="Plays full screen on the leaderboard when this team makes a sale. MP4 or WebM, up to 50 MB.">
+        <Card title="Celebration video" description="Plays full screen on the TV screens when this team makes a sale. To play instantly everywhere, upload an MP4 at 1080p, 30 fps, under 8 Mbps (about 12 MB for a 12-second clip); heavier videos are refused with export tips.">
           <VideoUploader teamId={team.id} videoUrl={team.videoPath ? videoPublicUrl(team.videoPath) : null} />
         </Card>
 

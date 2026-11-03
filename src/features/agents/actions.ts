@@ -1,7 +1,8 @@
 "use server";
 
 import { z } from "zod";
-import { failure, invalid, isPermissionDenied, success, unexpected, type ActionState } from "@/lib/action-state";
+import { CLOSER_WRITES_NOT_SET_UP, failure, invalid, isPermissionDenied, success, unexpected, type ActionState } from "@/lib/action-state";
+import { isAgentOnClosersTeam } from "@/features/teams/queries";
 import { requireAdmin, requireCloser } from "@/lib/auth";
 import { currentMonth } from "@/lib/current-month";
 import * as field from "@/lib/form-schemas";
@@ -74,7 +75,7 @@ export async function updateAgentAsCloser(
   _state: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
-  await requireCloser();
+  const closer = await requireCloser();
   const parsed = closerUpdateSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return invalid(parsed.error);
   const { agentId, name, phone, target } = parsed.data;
@@ -82,7 +83,7 @@ export async function updateAgentAsCloser(
   const contactError = await saveContact(agentId, { name, phone });
   if (contactError) return contactError;
   if (target !== undefined) {
-    const targetError = await saveTarget(agentId, target);
+    const targetError = await saveTarget(agentId, target, closer.id);
     if (targetError) return targetError;
   }
 
@@ -129,13 +130,17 @@ async function saveContact(
   return null;
 }
 
-async function saveTarget(agentId: string, amount: number): Promise<ActionState | null> {
+/** `closerId` is set when a closer (not an admin) is saving, to explain a refusal accurately. */
+async function saveTarget(agentId: string, amount: number, closerId?: string): Promise<ActionState | null> {
   const supabase = await createClient();
   const { error } = await supabase
     .from("monthly_targets")
     .upsert({ agent_id: agentId, month: currentMonth(), amount });
-  // A closer setting a target for an agent outside their team.
-  if (isPermissionDenied(error)) return failure("You can only set targets for agents on your own team.");
+  if (isPermissionDenied(error)) {
+    // Refused for their own agent means the database isn't set up for closer targets, not that it's the wrong team.
+    const ownAgent = closerId !== undefined && (await isAgentOnClosersTeam(agentId, closerId));
+    return failure(ownAgent ? CLOSER_WRITES_NOT_SET_UP : "You can only set targets for agents on your own team.");
+  }
   if (error) return unexpected(`saveTarget ${agentId}`, error);
   return null;
 }

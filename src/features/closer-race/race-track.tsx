@@ -24,7 +24,8 @@ function axisLabel(fraction: number, perCloserTarget: number | null): ReactNode 
 }
 
 /**
- * The race: one lane per closer, progress measured against their own target.
+ * The race: one lane per closer, progress measured against their own target,
+ * spanning the full screen width.
  * Markers sit at runner-centre positions, so a runner on the 50% line is
  * exactly halfway.
  */
@@ -41,7 +42,8 @@ export function RaceTrack({
   const centreInset = { left: 24 + RUNNER_WIDTH_PX / 2, right: 48 + RUNNER_WIDTH_PX / 2 };
 
   return (
-    <section className="rounded-3xl border border-slate-700/60 bg-slate-900/50 p-4 shadow-2xl">
+    // Full screen width: borders only top and bottom, square ends.
+    <section className="border-y border-slate-700/60 bg-slate-900/50 py-4 shadow-2xl">
       <div className="relative mb-2 h-5 text-[11px] font-bold uppercase tracking-wider text-slate-400">
         <div className="absolute inset-y-0" style={centreInset}>
           {QUARTERS.map((fraction) => (
@@ -57,7 +59,7 @@ export function RaceTrack({
         </div>
       </div>
 
-      <div className="relative overflow-hidden rounded-[3rem] border border-slate-600/60 bg-[linear-gradient(180deg,#152033_0%,#0f1726_100%)]">
+      <div className="relative overflow-hidden border-y border-slate-600/60 bg-[linear-gradient(180deg,#152033_0%,#0f1726_100%)]">
         {/* Quarter markers */}
         <div aria-hidden className="pointer-events-none absolute inset-y-0" style={centreInset}>
           {QUARTERS.slice(1, -1).map((fraction) => (
@@ -99,7 +101,7 @@ function Lane({
   const style = { "--team-accent": accent, "--team-on-accent": onAccent } as CSSProperties;
 
   return (
-    <div style={style} className={`relative h-[clamp(11rem,16.5vh,11.5rem)] ${isLast ? "" : "border-b border-slate-600/40"}`}>
+    <div style={style} className={`relative h-[clamp(11rem,16.5cqh,11.5rem)] ${isLast ? "" : "border-b border-slate-600/40"}`}>
       <div className="absolute inset-y-0 left-6 right-12">
         {/* The carrier spans the runner's whole travel, so translating it by `progress` of its own
             width puts the runner in place. A transform (not `left`) keeps the glide on the GPU,

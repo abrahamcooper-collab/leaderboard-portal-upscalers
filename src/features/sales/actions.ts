@@ -1,7 +1,8 @@
 "use server";
 
 import { z } from "zod";
-import { failure, invalid, isPermissionDenied, success, unexpected, type ActionState } from "@/lib/action-state";
+import { CLOSER_WRITES_NOT_SET_UP, failure, invalid, isPermissionDenied, success, unexpected, type ActionState } from "@/lib/action-state";
+import { isAgentOnClosersTeam } from "@/features/teams/queries";
 import { requireAdmin, requireUser } from "@/lib/auth";
 import * as field from "@/lib/form-schemas";
 import { formatUsdExact } from "@/lib/money";
@@ -28,7 +29,11 @@ export async function recordSale(_state: ActionState, formData: FormData): Promi
   const { error } = await supabase
     .from("sales")
     .insert({ agent_id: agentId, amount, created_by: user.id });
-  if (isPermissionDenied(error)) return failure("You can only record sales for agents on your own team.");
+  if (isPermissionDenied(error)) {
+    // Refused for their own agent means the database isn't set up for closer sales, not that it's the wrong team.
+    const ownAgent = user.role === "closer" && (await isAgentOnClosersTeam(agentId, user.id));
+    return failure(ownAgent ? CLOSER_WRITES_NOT_SET_UP : "You can only record sales for agents on your own team.");
+  }
   if (error) return unexpected(`recordSale agent ${agentId} by ${user.id}`, error);
 
   revalidateApp();

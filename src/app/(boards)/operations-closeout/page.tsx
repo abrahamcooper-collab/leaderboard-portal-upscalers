@@ -4,6 +4,7 @@ import { CloserRaceScreen } from "@/features/closer-race/closer-race-screen";
 import { CloserRaceView } from "@/features/closer-race/closer-race-view";
 import { getStandings } from "@/features/leaderboard/queries";
 import { getRecentSalesByTeam } from "@/features/sales/queries";
+import { BOARD_LAYOUT_WIDTH, FitToScreen } from "@/features/slideshow/fit-to-screen";
 import { requireUser } from "@/lib/auth";
 import { currentMonth } from "@/lib/current-month";
 import { formatMonth } from "@/lib/month";
@@ -19,11 +20,14 @@ export default async function OperationsCloseoutPage() {
   const runners = toRaceRunners(standings);
 
   return (
-    <main className="flex flex-1 flex-col">
-      <CloserRaceScreen>
-        <BoardExitLink role={user.role} />
-        <CloserRaceView runners={runners} summary={summarizeRace(runners)} recentSalesByTeam={recentSalesByTeam} monthLabel={formatMonth(month)} />
-      </CloserRaceScreen>
+    // Fitted to the screen like the slideshow, so a TV shows the whole race edge to edge without scrolling.
+    <main className="relative h-dvh">
+      <FitToScreen mode="contain" minLayoutWidth={BOARD_LAYOUT_WIDTH} background="#0b1120">
+        <CloserRaceScreen>
+          <CloserRaceView runners={runners} summary={summarizeRace(runners)} recentSalesByTeam={recentSalesByTeam} monthLabel={formatMonth(month)} />
+        </CloserRaceScreen>
+      </FitToScreen>
+      <BoardExitLink role={user.role} />
     </main>
   );
 }

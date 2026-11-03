@@ -7,9 +7,12 @@ import { Button, Input } from "@/components/ui";
 import { createClient } from "@/lib/supabase/browser";
 import { VIDEO_BUCKET } from "@/lib/supabase/storage";
 import { removeTeamVideo, setTeamVideo } from "./actions";
+import { HOW_TO_EXPORT, readVideoFacts, videoProblems } from "./video-check";
 
 // Matches the bucket's file_size_limit in the migration.
 const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
+// MOV and other containers don't play in every browser; MP4 (H.264) and WebM do.
+const PLAYABLE_TYPES = ["video/mp4", "video/webm"];
 // Every upload gets a new path, so a file never changes and can be cached
 // for a year — reloading the board doesn't re-download videos.
 const IMMUTABLE_CACHE_SECONDS = String(365 * 24 * 60 * 60);
@@ -17,6 +20,7 @@ const IMMUTABLE_CACHE_SECONDS = String(365 * 24 * 60 * 60);
 /**
  * Uploads straight from the browser to Supabase Storage (videos are too big
  * for a Server Action body), then tells the server to use the new file.
+ * Videos that would lag on a TV are refused first, with how to export them.
  */
 export function VideoUploader({ teamId, videoUrl }: { teamId: string; videoUrl: string | null }) {
   const router = useRouter();
@@ -30,8 +34,18 @@ export function VideoUploader({ teamId, videoUrl }: { teamId: string; videoUrl: 
       setMessage({ isError: true, text: "Video must be 50 MB or smaller." });
       return;
     }
+    if (!PLAYABLE_TYPES.includes(file.type)) {
+      setMessage({ isError: true, text: `Upload an MP4 or WebM file. ${HOW_TO_EXPORT}` });
+      return;
+    }
 
     startTransition(async () => {
+      const problem = await checkPlaysInstantly(file);
+      if (problem) {
+        setMessage({ isError: true, text: problem });
+        return;
+      }
+
       const supabase = createClient();
       const extension = file.name.split(".").pop()?.toLowerCase() || "mp4";
       const path = `${teamId}/${crypto.randomUUID()}.${extension}`;
@@ -66,7 +80,7 @@ export function VideoUploader({ teamId, videoUrl }: { teamId: string; videoUrl: 
       <div className="flex flex-wrap items-center gap-3">
         <Input
           type="file"
-          accept="video/mp4,video/webm,video/quicktime"
+          accept={PLAYABLE_TYPES.join(",")}
           className="max-w-xs"
           onChange={(event) => setFile(event.target.files?.[0] ?? null)}
         />
@@ -86,4 +100,14 @@ export function VideoUploader({ teamId, videoUrl }: { teamId: string; videoUrl: 
       )}
     </div>
   );
+}
+
+/** Null when the video will play instantly on every screen; otherwise why not, and what to do. */
+async function checkPlaysInstantly(file: File): Promise<string | null> {
+  try {
+    const problems = videoProblems(await readVideoFacts(file));
+    return problems.length ? `This video would lag on the TVs: ${problems.join("; ")}. ${HOW_TO_EXPORT}` : null;
+  } catch {
+    return `This browser can't play this video, so the boards couldn't either. ${HOW_TO_EXPORT}`;
+  }
 }

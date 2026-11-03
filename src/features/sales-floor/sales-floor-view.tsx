@@ -1,4 +1,5 @@
 import Image from "next/image";
+import type { CSSProperties } from "react";
 import type { TeamStanding } from "@/features/leaderboard/model";
 import { sortByTeamOrder } from "@/features/teams/team-order";
 import { TeamPanel } from "./team-panel";
@@ -23,17 +24,17 @@ export function SalesFloorView({
   const rowCount = Math.max(MIN_ROWS, ...teams.map((team) => team.agents.length));
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-[min(1.5rem,2vh)]">
+    <div className="flex min-h-0 flex-1 flex-col gap-[min(1.5rem,2cqh)]">
       <header className="grid shrink-0 grid-cols-1 items-center gap-6 md:grid-cols-[1fr_2fr_1fr]">
         {/* Cropped above the logo's tagline. */}
-        <div className="relative mx-auto aspect-[1254/960] w-[clamp(8rem,min(13vw,22vh),14rem)] overflow-hidden md:mx-0">
+        <div className="relative mx-auto aspect-[1254/960] w-[clamp(8rem,min(13cqw,22cqh),14rem)] overflow-hidden md:mx-0">
           <Image src={logo} alt="Creative Giants" fill preload sizes="14rem" className="object-cover object-top" />
         </div>
 
         <div className="text-center">
           <h1 className="inline-flex -rotate-2 flex-col font-[family-name:var(--font-marker)] uppercase leading-[0.9] text-zinc-100 [text-shadow:0_2px_0_#000,0_0_24px_rgba(255,255,255,0.15)]">
-            <span className="text-[clamp(2.25rem,min(5vw,8.5vh),5.5rem)]">Sales</span>
-            <span className="text-[clamp(2.25rem,min(5vw,8.5vh),5.5rem)]">Leaderboard</span>
+            <span className="text-[clamp(2.25rem,min(5cqw,8.5cqh),5.5rem)]">Sales</span>
+            <span className="text-[clamp(2.25rem,min(5cqw,8.5cqh),5.5rem)]">Leaderboard</span>
           </h1>
           <div className="mx-auto mt-2 h-1.5 w-2/3 -rotate-1 rounded-full bg-gradient-to-r from-transparent via-red-600 to-transparent" />
           <p className="mt-3 font-[family-name:var(--font-condensed)] text-sm uppercase tracking-[0.4em] text-zinc-400">
@@ -41,7 +42,7 @@ export function SalesFloorView({
           </p>
         </div>
 
-        <ul className="hidden justify-self-end border-l border-zinc-600 pl-6 font-[family-name:var(--font-condensed)] text-[clamp(0.9rem,1.3vw,1.4rem)] font-light uppercase leading-relaxed tracking-[0.3em] text-zinc-300 md:block">
+        <ul className="hidden justify-self-end border-l border-zinc-600 pl-6 font-[family-name:var(--font-condensed)] text-[clamp(0.9rem,1.3cqw,1.4rem)] font-light uppercase leading-relaxed tracking-[0.3em] text-zinc-300 md:block">
           {TAGLINES.map((tagline) => (
             <li key={tagline}>{tagline}</li>
           ))}
@@ -51,7 +52,11 @@ export function SalesFloorView({
       {teams.length === 0 ? (
         <p className="py-24 text-center text-lg text-zinc-500">No teams yet.</p>
       ) : (
-        <div className="grid min-h-0 flex-1 gap-6 [grid-template-columns:repeat(auto-fit,minmax(min(100%,22rem),1fr))]">
+        // One column per team side by side on anything wider than a phone, so no table wraps to a second row.
+        <div
+          className="grid min-h-0 flex-1 gap-6 md:[grid-template-columns:repeat(var(--team-count),minmax(0,1fr))]"
+          style={{ "--team-count": teams.length } as CSSProperties}
+        >
           {teams.map((team) => (
             <TeamPanel key={team.id} team={team} rowCount={rowCount} />
           ))}

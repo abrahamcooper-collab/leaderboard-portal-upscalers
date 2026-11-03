@@ -40,3 +40,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Celebration videos converted for TV playback; upload them via Admin → Teams, never commit them.
+/tv-ready-videos/

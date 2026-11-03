@@ -26,7 +26,7 @@ function displayTeamName(name: string): string {
 
 const CELL = "border-r border-[var(--team-line)] px-3 py-[0.2em] last:border-r-0";
 // Text scales with the screen's height as well as its width, so a full board fits a TV without scrolling.
-const ROW_TEXT = "text-[clamp(0.95rem,min(1.35vw,2.1vh),1.6rem)]";
+const ROW_TEXT = "text-[clamp(0.95rem,min(1.35cqw,2.1cqh),1.6rem)]";
 
 /**
  * One team's chalkboard table. `rowCount` pads the table with empty rows so
@@ -49,7 +49,7 @@ export function TeamPanel({ team, rowCount }: { team: TeamStanding; rowCount: nu
     >
       <header className="flex items-center gap-4 px-5 py-3">
         <Avatar name={team.closerName} src={closerAvatarSrc(team.name, team.closerAvatarPath)} size={56} />
-        <h2 className="flex min-w-0 items-baseline gap-3 font-[family-name:var(--font-marker)] text-[clamp(1.5rem,min(2.3vw,4vh),2.6rem)] uppercase leading-none">
+        <h2 className="flex min-w-0 items-baseline gap-3 font-[family-name:var(--font-marker)] text-[clamp(1.5rem,min(2.3cqw,4cqh),2.6rem)] uppercase leading-none">
           <span className="text-white">Team</span>
           <span className="truncate text-[var(--team-accent)]">{displayTeamName(team.name)}</span>
         </h2>
@@ -64,7 +64,7 @@ export function TeamPanel({ team, rowCount }: { team: TeamStanding; rowCount: nu
           <col className="w-[17%]" />
           <col className="w-[14%]" />
         </colgroup>
-        <thead className="bg-[var(--team-accent)] font-[family-name:var(--font-condensed)] text-[clamp(0.8rem,min(1.05vw,1.8vh),1.15rem)] uppercase tracking-wide text-[var(--team-on-accent)]">
+        <thead className="bg-[var(--team-accent)] font-[family-name:var(--font-condensed)] text-[clamp(0.8rem,min(1.05cqw,1.8cqh),1.15rem)] uppercase tracking-wide text-[var(--team-on-accent)]">
           <tr>
             <th className={`${CELL} py-2 text-left font-medium`}>Agent</th>
             <th className={`${CELL} py-2 text-left font-medium`}>Target</th>
@@ -88,7 +88,7 @@ export function TeamPanel({ team, rowCount }: { team: TeamStanding; rowCount: nu
             </tr>
           ))}
         </tbody>
-        <tfoot className="border-t-2 border-[var(--team-accent)] font-[family-name:var(--font-condensed)] text-[clamp(0.9rem,min(1.2vw,2vh),1.35rem)] uppercase text-white">
+        <tfoot className="border-t-2 border-[var(--team-accent)] font-[family-name:var(--font-condensed)] text-[clamp(0.9rem,min(1.2cqw,2cqh),1.35rem)] uppercase text-white">
           <tr>
             <td className={`${CELL} font-semibold text-[var(--team-accent)]`}>Team total</td>
             <td className={`${CELL} tabular-nums`}>{dollars(team.target)}</td>
