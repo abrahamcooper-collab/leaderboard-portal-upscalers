@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
 import { videoPublicUrl } from "@/lib/supabase/storage";
@@ -10,12 +10,17 @@ import { usePreloadedVideos } from "./use-preloaded-videos";
 
 // The TV controls fade out once the mouse has been still this long, so they don't sit on the board.
 const CONTROLS_IDLE_MS = 4_000;
+// Catching up after a dropped connection or a hidden tab: sales this recent still get their
+// celebration, at most this many, so a TV waking from sleep doesn't replay a backlog.
+const CATCH_UP_WINDOW_MS = 10 * 60_000;
+const MAX_CATCH_UP = 3;
 
 /**
- * Keeps a TV board live (the Sales Floor, or the slideshow): every sale insert
- * queues a full-screen celebration and re-fetches the page's data from the
- * server. `videoUrls` are all teams' celebration videos, downloaded up front
- * so they play instantly.
+ * Keeps the TV pages live (see the boards layout): every new sale queues a
+ * full-screen celebration over whatever is showing and re-fetches the page's
+ * data. Each sale is celebrated once, whether it arrives live or is caught up
+ * after a gap. `videoUrls` are all teams' celebration videos, downloaded up
+ * front so they play instantly.
  */
 export function LiveBoard({
   videoUrls,
@@ -29,10 +34,29 @@ export function LiveBoard({
   // Browsers only allow video with sound after someone interacts with the page.
   const [soundOn, setSoundOn] = useState(false);
 
-  useLiveSales("live-board", (supabase, sale) => {
+  const celebratedSaleIds = useRef(new Set<string>());
+  // Only sales after the board opened are celebrated; this moves forward as they arrive.
+  // Set on mount, which runs before useLiveSales's effect below can ask to catch up.
+  const lastSaleAt = useRef(0);
+  useEffect(() => {
+    lastSaleAt.current = Date.now();
+  }, []);
+
+  const celebrate = (supabase: SupabaseClient<Database>, sale: SaleRow) => {
+    if (celebratedSaleIds.current.has(sale.id)) return;
+    celebratedSaleIds.current.add(sale.id);
+    lastSaleAt.current = Math.max(lastSaleAt.current, Date.parse(sale.created_at));
     loadCelebration(supabase, sale).then((celebration) => {
       if (celebration) setQueue((current) => [...current, celebration]);
     });
+  };
+
+  useLiveSales("live-board", {
+    onInsert: celebrate,
+    onResume: async (supabase) => {
+      const since = Math.max(lastSaleAt.current, Date.now() - CATCH_UP_WINDOW_MS);
+      for (const sale of await loadSalesSince(supabase, since)) celebrate(supabase, sale);
+    },
   });
 
   const finishCurrent = useCallback(() => setQueue((current) => current.slice(1)), []);
@@ -46,7 +70,7 @@ export function LiveBoard({
         <CelebrationOverlay
           key={current.key}
           celebration={current}
-          videoSrc={current.videoUrl && (preloadedVideos.get(current.videoUrl) ?? current.videoUrl)}
+          videoSources={videoSourcesFor(current.videoUrl, preloadedVideos)}
           soundOn={soundOn}
           onDone={finishCurrent}
         />
@@ -97,6 +121,28 @@ function BoardButton({ onClick, children }: { onClick: () => void; children: str
       {children}
     </button>
   );
+}
+
+/** Where to play a team's video from, best first: the copy on this device, then streamed from Storage. */
+function videoSourcesFor(videoUrl: string | null, preloaded: ReadonlyMap<string, string>): string[] {
+  if (!videoUrl) return [];
+  const local = preloaded.get(videoUrl);
+  return local ? [local, videoUrl] : [videoUrl];
+}
+
+/** Sales recorded after `since` (ms), oldest first, so missed ones play in order. */
+async function loadSalesSince(supabase: SupabaseClient<Database>, since: number): Promise<SaleRow[]> {
+  const { data, error } = await supabase
+    .from("sales")
+    .select("*")
+    .gt("created_at", new Date(since).toISOString())
+    .order("created_at")
+    .limit(MAX_CATCH_UP);
+  if (error) {
+    console.error(`[board] Catching up on sales since ${new Date(since).toISOString()}: ${error.message}`);
+    return [];
+  }
+  return data;
 }
 
 async function loadCelebration(

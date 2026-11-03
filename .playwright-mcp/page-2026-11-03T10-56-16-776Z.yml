@@ -1,0 +1,11 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - img "x" [ref=e6]
+    - alert [ref=e7] [cursor=pointer]:
+      - generic [ref=e9]:
+        - paragraph [ref=e10]: $2,500
+        - paragraph [ref=e11]: Joe Bell
+        - paragraph [ref=e12]: Team Bill
+    - paragraph [ref=e13]: showing
+  - button "Open Next.js Dev Tools" [ref=e19] [cursor=pointer]
+  - alert [ref=e23]

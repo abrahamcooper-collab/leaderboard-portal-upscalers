@@ -11,17 +11,20 @@ export type RunnerMotion = {
   covered: number;
   /** 0–1 position on the track. */
   progress: number;
-  /** Run-cycle length in ms, or null when standing still. */
+  /** Run-cycle length in ms, or null when standing still (no sales yet). */
   strideMs: number | null;
+  /** True while a recent sale's distance is still being covered. */
+  isCovering: boolean;
 };
 
 /**
  * A runner's live motion. While a recent sale's run is in progress the
  * position advances every tick, reaching the final spot exactly when the run
- * (and the running animation) ends; the stride quickens for bigger sales.
+ * ends, and the stride quickens for bigger sales. Between sales the runner
+ * keeps jogging in place (see `strideMsAt`).
  */
 export function useRunnerMotion(
-  runner: Pick<RaceRunner, "salesTotal" | "target">,
+  runner: Pick<RaceRunner, "salesTotal" | "salesCount" | "target">,
   recentSales: readonly RecentSale[],
 ): RunnerMotion {
   const endsAt = runEndsAt(recentSales);
@@ -41,6 +44,7 @@ export function useRunnerMotion(
   return {
     covered,
     progress: trackProgress(covered, runner.target),
-    strideMs: strideMsAt(runner.target, recentSales, now),
+    strideMs: strideMsAt(runner, recentSales, now),
+    isCovering: now < endsAt,
   };
 }

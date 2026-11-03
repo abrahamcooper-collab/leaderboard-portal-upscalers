@@ -1,0 +1,70 @@
+- main [ref=e2]:
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - paragraph [ref=e6]: Creative Giants · Operations Closeout · November 2026
+      - heading "Closer Race" [level=1] [ref=e7]
+      - paragraph [ref=e8]: 3 closers. One target. Every deal moves you closer to the crown.
+      - list [ref=e9]:
+        - listitem [ref=e10]: 🎯 Team target $30,000
+        - listitem [ref=e11]: 🏁 Per closer $10,000
+        - listitem [ref=e12]: ⚡ Current team sales $9,000
+        - listitem [ref=e13]: 👑 Leader Mike Specter
+    - generic [ref=e14]:
+      - generic [ref=e16]:
+        - generic [ref=e17]:
+          - text: $0
+          - generic [ref=e18]: · Start
+        - generic [ref=e19]: $2,500
+        - generic [ref=e20]: $5,000
+        - generic [ref=e21]: $7,500
+        - generic [ref=e22]:
+          - text: $10,000
+          - generic [ref=e23]: · Finish
+      - generic [ref=e24]:
+        - generic [ref=e30]:
+          - generic [ref=e31]: $0
+          - img "Daniel Richard (sad)" [ref=e50]
+          - generic [ref=e51]: Daniel
+        - generic [ref=e55]:
+          - generic [ref=e56]: $3,000
+          - img "Bill Anderson (neutral)" [ref=e88]
+          - generic [ref=e89]: Bill
+        - generic [ref=e93]:
+          - generic [ref=e94]: $4,200
+          - img "Mike Specter (happy)" [ref=e126]
+          - generic [ref=e127]: Mike
+    - generic [ref=e128]:
+      - article [ref=e129]:
+        - generic [ref=e130]:
+          - img "Daniel Richard (sad)" [ref=e131]
+          - generic [ref=e132]:
+            - heading "Daniel Richard" [level=3] [ref=e133]
+            - paragraph [ref=e134]: "Rank #3"
+        - generic [ref=e135]:
+          - paragraph [ref=e136]: $0
+          - paragraph [ref=e137]: 0%
+        - progressbar [ref=e138]
+        - paragraph [ref=e139]: 0 sales · target $10,000
+      - article [ref=e140]:
+        - generic [ref=e141]:
+          - img "Bill Anderson (neutral)" [ref=e142]
+          - generic [ref=e143]:
+            - heading "Bill Anderson" [level=3] [ref=e144]
+            - paragraph [ref=e145]: "Rank #2"
+        - generic [ref=e146]:
+          - paragraph [ref=e147]: $3,000
+          - paragraph [ref=e148]: 30%
+        - progressbar [ref=e149]
+        - paragraph [ref=e151]: 2 sales · target $10,000
+      - article [ref=e152]:
+        - generic [ref=e153]:
+          - img "Mike Specter (happy)" [ref=e154]
+          - generic [ref=e155]:
+            - heading "Mike Specter" [level=3] [ref=e156]
+            - paragraph [ref=e157]: "Rank #1 · Leader"
+        - generic [ref=e158]:
+          - paragraph [ref=e159]: $6,000
+          - paragraph [ref=e160]: 60%
+        - progressbar [ref=e161]
+        - paragraph [ref=e163]: 3 sales · target $10,000
+    - paragraph [ref=e164]: 🏁 0 of 3 closers have reached their target.

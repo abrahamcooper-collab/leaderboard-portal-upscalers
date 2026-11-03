@@ -84,7 +84,7 @@ export function RaceTrack({
   );
 }
 
-/** One closer's lane. Their runner runs only after their own team's sales, and arrives as it stops. */
+/** One closer's lane. The runner moves forward only after their own team's sales, arriving as that run ends. */
 function Lane({
   runner,
   isLast,
@@ -94,7 +94,7 @@ function Lane({
   isLast: boolean;
   recentSales: readonly RecentSale[];
 }) {
-  const { covered, progress, strideMs } = useRunnerMotion(runner, recentSales);
+  const { covered, progress, strideMs, isCovering } = useRunnerMotion(runner, recentSales);
   const { accent, onAccent } = TEAM_COLORS[runner.color];
   const style = { "--team-accent": accent, "--team-on-accent": onAccent } as CSSProperties;
 
@@ -111,7 +111,7 @@ function Lane({
           style={{
             width: `calc(100% - ${RUNNER_WIDTH_PX}px)`,
             transform: `translateX(${progress * 100}%)`,
-            transition: strideMs !== null ? RUNNING_TRANSITION : SETTLE_TRANSITION,
+            transition: isCovering ? RUNNING_TRANSITION : SETTLE_TRANSITION,
           }}
         >
           <div className="absolute bottom-1.5 left-0 flex flex-col items-center" style={{ width: RUNNER_WIDTH_PX }}>

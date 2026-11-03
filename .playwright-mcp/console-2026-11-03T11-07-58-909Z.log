@@ -1,0 +1,16 @@
+[     802ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3125/_next/static/chunks/1bba_next_dist_041c6vio7na_y._.js:719
+[    1111ms] [LOG] [HMR] connected @ http://localhost:3125/_next/static/chunks/1bba_next_dist_041c6vio7na_y._.js:719
+[    2128ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3125/_next/static/chunks/1bba_next_dist_041c6vio7na_y._.js:719
+[    2189ms] [LOG] [HMR] connected @ http://localhost:3125/_next/static/chunks/1bba_next_dist_041c6vio7na_y._.js:719
+[    2355ms] [ERROR] Failed to load resource: net::ERR_INTERNET_DISCONNECTED @ https://jhyurxjtufbfyvhjydhu.supabase.co/storage/v1/object/public/celebration-videos/0dcce5c7-013e-4d01-9ee2-2322ff2aab07/c3edb3a0-506b-4fcf-9f05-177d1f16c875.mov:0
+[    2357ms] [WARNING] [board] Preloading https://jhyurxjtufbfyvhjydhu.supabase.co/storage/v1/object/public/celebration-videos/0dcce5c7-013e-4d01-9ee2-2322ff2aab07/c3edb3a0-506b-4fcf-9f05-177d1f16c875.mov failed; streaming it until a retry succeeds. TypeError: Failed to fetch
+    at download (http://localhost:3125/_next/static/chunks/_0xpd8evh-xa1_._.js:377:28)
+    at loadAsBlobUrl (http://localhost:3125/_next/static/chunks/_0xpd8evh-xa1_._.js:369:53) @ http://localhost:3125/_next/static/chunks/1bba_next_dist_041c6vio7na_y._.js:719
+[    2364ms] [ERROR] Failed to load resource: net::ERR_INTERNET_DISCONNECTED @ https://jhyurxjtufbfyvhjydhu.supabase.co/storage/v1/object/public/celebration-videos/bf5d431e-2590-48cc-a221-5adbda96440c/3a5c1b9c-3209-47e8-bf99-d0224852097b.mp4:0
+[    2364ms] [WARNING] [board] Preloading https://jhyurxjtufbfyvhjydhu.supabase.co/storage/v1/object/public/celebration-videos/bf5d431e-2590-48cc-a221-5adbda96440c/3a5c1b9c-3209-47e8-bf99-d0224852097b.mp4 failed; streaming it until a retry succeeds. TypeError: Failed to fetch
+    at download (http://localhost:3125/_next/static/chunks/_0xpd8evh-xa1_._.js:377:28)
+    at loadAsBlobUrl (http://localhost:3125/_next/static/chunks/_0xpd8evh-xa1_._.js:369:53) @ http://localhost:3125/_next/static/chunks/1bba_next_dist_041c6vio7na_y._.js:719
+[    2366ms] [ERROR] Failed to load resource: net::ERR_INTERNET_DISCONNECTED @ https://jhyurxjtufbfyvhjydhu.supabase.co/storage/v1/object/public/celebration-videos/f38c9bdd-4f46-4c56-8aa8-1dd17634096d/d4f5f610-6416-4ca3-867d-154b70312134.mov:0
+[    2366ms] [WARNING] [board] Preloading https://jhyurxjtufbfyvhjydhu.supabase.co/storage/v1/object/public/celebration-videos/f38c9bdd-4f46-4c56-8aa8-1dd17634096d/d4f5f610-6416-4ca3-867d-154b70312134.mov failed; streaming it until a retry succeeds. TypeError: Failed to fetch
+    at download (http://localhost:3125/_next/static/chunks/_0xpd8evh-xa1_._.js:377:28)
+    at loadAsBlobUrl (http://localhost:3125/_next/static/chunks/_0xpd8evh-xa1_._.js:369:53) @ http://localhost:3125/_next/static/chunks/1bba_next_dist_041c6vio7na_y._.js:719

@@ -1,14 +1,14 @@
 import { BoardExitLink } from "@/components/board-exit-link";
 import { RUN_AFTER_SALE_MS, toRaceRunners, summarizeRace } from "@/features/closer-race/model";
 import { CloserRaceScreen } from "@/features/closer-race/closer-race-screen";
-import { LiveRace } from "@/features/closer-race/live-race";
+import { CloserRaceView } from "@/features/closer-race/closer-race-view";
 import { getStandings } from "@/features/leaderboard/queries";
 import { getRecentSalesByTeam } from "@/features/sales/queries";
 import { requireUser } from "@/lib/auth";
 import { currentMonth } from "@/lib/current-month";
 import { formatMonth } from "@/lib/month";
 
-/** Operations Closeout: the closer race. Any signed-in user can open it. */
+/** Operations Closeout: the closer race. Any signed-in user can open it; the layout keeps it live. */
 export default async function OperationsCloseoutPage() {
   const user = await requireUser();
   const month = currentMonth();
@@ -22,7 +22,7 @@ export default async function OperationsCloseoutPage() {
     <main className="flex flex-1 flex-col">
       <CloserRaceScreen>
         <BoardExitLink role={user.role} />
-        <LiveRace runners={runners} summary={summarizeRace(runners)} recentSalesByTeam={recentSalesByTeam} monthLabel={formatMonth(month)} />
+        <CloserRaceView runners={runners} summary={summarizeRace(runners)} recentSalesByTeam={recentSalesByTeam} monthLabel={formatMonth(month)} />
       </CloserRaceScreen>
     </main>
   );

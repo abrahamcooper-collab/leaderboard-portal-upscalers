@@ -8,12 +8,12 @@ import { sortByTeamOrder } from "@/features/teams/team-order";
 
 export type Mood = "happy" | "neutral" | "sad";
 
-/** How long a runner takes to cover the distance a sale adds (and keeps running). */
+/** How long a runner takes to cover the distance a sale adds. */
 export const RUN_AFTER_SALE_MS = 10 * 60_000;
 
 export type RecentSale = { soldAt: string; amount: number };
 
-// Stride length of the run cycle: a slow jog for a small sale, a sprint for a big one.
+// Stride length of the run cycle: a steady jog between sales and for a small one, a sprint for a big one.
 const SLOWEST_STRIDE_MS = 900;
 const FASTEST_STRIDE_MS = 350;
 // Covering this share of the track in one run (e.g. half the target) is a full sprint.
@@ -129,15 +129,23 @@ export function trackProgress(covered: number, target: number): number {
 }
 
 /**
- * Stride length at `now`, from how fast the runner is moving: the share of
- * the track its in-progress sales cover per run. Bigger or overlapping sales
- * mean quicker legs. Null once every sale's run has finished. (A sale
- * stamped a moment after `now` counts as in progress, so a runner whose clock
- * hasn't ticked since the sale arrived still runs.)
+ * Stride length at `now`. A closer with no sales this month stands still
+ * (null). Anyone with a sale is always running: a steady jog in place, and
+ * while a recent sale's distance is being covered, quicker legs for a bigger
+ * share of the track (overlapping sales add up). A sale stamped a moment
+ * after `now` counts as in progress, so a runner whose clock hasn't ticked
+ * since the sale arrived still speeds up.
  */
-export function strideMsAt(target: number, recentSales: readonly RecentSale[], now: number): number | null {
+export function strideMsAt(
+  runner: Pick<RaceRunner, "target" | "salesCount">,
+  recentSales: readonly RecentSale[],
+  now: number,
+): number | null {
+  if (runner.salesCount === 0) return null;
   const active = recentSales.filter((sale) => runFraction(sale, now) < 1);
-  if (active.length === 0) return null;
+  if (active.length === 0) return SLOWEST_STRIDE_MS;
+
+  const { target } = runner;
 
   const trackShare = target > 0 ? sum(active.map((sale) => sale.amount)) / target : SPRINT_TRACK_SHARE;
   // Square root so small sales still look noticeably different from each other.

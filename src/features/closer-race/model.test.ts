@@ -112,25 +112,35 @@ describe("coveredAt + trackProgress", () => {
 });
 
 describe("strideMsAt", () => {
-  it("is null when no run is in progress", () => {
-    expect(strideMsAt(10_000, [], saleAt)).toBeNull();
-    expect(strideMsAt(10_000, [sale(0, 1000)], saleAt + RUN_AFTER_SALE_MS + 1)).toBeNull();
+  const withSales = { target: 10_000, salesCount: 3 };
+
+  it("stands a closer with no sales this month still", () => {
+    expect(strideMsAt({ target: 10_000, salesCount: 0 }, [], saleAt)).toBeNull();
+  });
+
+  it("keeps a closer with sales jogging between runs, slower than any run", () => {
+    const idle = strideMsAt(withSales, [], saleAt);
+    const afterRun = strideMsAt(withSales, [sale(0, 1000)], saleAt + RUN_AFTER_SALE_MS + 1);
+    const smallestRun = strideMsAt(withSales, [sale(0, 1)], saleAt + 1000)!;
+    expect(idle).not.toBeNull();
+    expect(afterRun).toBe(idle);
+    expect(smallestRun).toBeLessThanOrEqual(idle!);
   });
 
   it("strides faster for bigger sales, sprinting at half the track per run", () => {
-    const small = strideMsAt(10_000, [sale(0, 200)], saleAt + 1000)!;
-    const medium = strideMsAt(10_000, [sale(0, 1000)], saleAt + 1000)!;
-    const big = strideMsAt(10_000, [sale(0, 5000)], saleAt + 1000)!;
+    const small = strideMsAt(withSales, [sale(0, 200)], saleAt + 1000)!;
+    const medium = strideMsAt(withSales, [sale(0, 1000)], saleAt + 1000)!;
+    const big = strideMsAt(withSales, [sale(0, 5000)], saleAt + 1000)!;
     expect(small).toBeGreaterThan(medium);
     expect(medium).toBeGreaterThan(big);
     expect(big).toBe(350);
-    expect(strideMsAt(10_000, [sale(0, 50_000)], saleAt + 1000)).toBe(350);
+    expect(strideMsAt(withSales, [sale(0, 50_000)], saleAt + 1000)).toBe(350);
   });
 
   it("speeds up while two sales overlap, then slows when the first finishes", () => {
     const sales = [sale(0, 1000), sale(RUN_AFTER_SALE_MS / 2, 1000)];
-    const bothActive = strideMsAt(10_000, sales, saleAt + RUN_AFTER_SALE_MS * 0.75)!;
-    const secondOnly = strideMsAt(10_000, sales, saleAt + RUN_AFTER_SALE_MS * 1.25)!;
+    const bothActive = strideMsAt(withSales, sales, saleAt + RUN_AFTER_SALE_MS * 0.75)!;
+    const secondOnly = strideMsAt(withSales, sales, saleAt + RUN_AFTER_SALE_MS * 1.25)!;
     expect(bothActive).toBeLessThan(secondOnly);
   });
 });

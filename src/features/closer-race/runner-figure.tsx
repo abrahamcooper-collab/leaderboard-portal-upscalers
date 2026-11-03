@@ -68,7 +68,7 @@ function Arm({ far }: { far: boolean }) {
 
 /**
  * A side-on runner with the closer's avatar as the head. Runs (limbs cycle,
- * body bobs and leans) with a stride of `strideMs`; stands still when null.
+ * body bobs and leans) with a stride of `strideMs`; stands still when null (no sales yet).
  */
 export function RunnerFigure({
   name,
