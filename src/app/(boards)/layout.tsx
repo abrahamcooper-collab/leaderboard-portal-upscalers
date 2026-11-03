@@ -19,5 +19,12 @@ export default async function BoardsLayout({ children }: { children: ReactNode }
     videoUrl: videoPath ? videoPublicUrl(videoPath) : null,
   }));
 
-  return <LiveBoard agents={celebrationAgents}>{children}</LiveBoard>;
+  // The server's clock, so "sales since the board opened" doesn't depend on a TV's (often wrong) time.
+  const renderedAt = new Date().toISOString();
+
+  return (
+    <LiveBoard agents={celebrationAgents} renderedAt={renderedAt}>
+      {children}
+    </LiveBoard>
+  );
 }

@@ -1,19 +1,16 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
-import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Database } from "@/lib/supabase/database.types";
-import { videoPublicUrl } from "@/lib/supabase/storage";
+import { listSalesSince, type NewSale } from "./actions";
 import { CelebrationStage, type Celebration } from "./celebration-stage";
-import { useLiveSales, type SaleRow } from "./use-live-sales";
+import { useLiveSales } from "./use-live-sales";
 import { usePreloadedVideos } from "./use-preloaded-videos";
 
 // The TV controls fade out once the mouse has been still this long, so they don't sit on the board.
 const CONTROLS_IDLE_MS = 4_000;
 // Catching up after a dropped connection or a hidden tab: sales this recent still get their
-// celebration, at most this many, so a TV waking from sleep doesn't replay a backlog.
+// celebration (a few at most; see listSalesSince), so a TV waking from sleep doesn't replay a backlog.
 const CATCH_UP_WINDOW_MS = 10 * 60_000;
-const MAX_CATCH_UP = 3;
 
 /** An active agent, with what their sale's celebration shows. */
 export type CelebrationAgent = { id: string; agentName: string; teamName: string; videoUrl: string | null };
@@ -26,7 +23,16 @@ export type CelebrationAgent = { id: string; agentName: string; teamName: string
  * arrives, without a lookup; their teams' videos are downloaded and kept
  * ready to play.
  */
-export function LiveBoard({ agents, children }: { agents: readonly CelebrationAgent[]; children: ReactNode }) {
+export function LiveBoard({
+  agents,
+  renderedAt,
+  children,
+}: {
+  agents: readonly CelebrationAgent[];
+  /** When the server rendered the page (ISO); anchors "since the board opened" to the server's clock. */
+  renderedAt: string;
+  children: ReactNode;
+}) {
   const videoUrls = [...new Set(agents.flatMap((agent) => (agent.videoUrl ? [agent.videoUrl] : [])))].sort();
   const preloadedVideos = usePreloadedVideos(videoUrls);
   const [queue, setQueue] = useState<Celebration[]>([]);
@@ -39,33 +45,52 @@ export function LiveBoard({ agents, children }: { agents: readonly CelebrationAg
     agentsById.current = new Map(agents.map((agent) => [agent.id, agent]));
   }, [agents]);
 
+  // How far this device's clock is from the server's, so catch-up windows use server time.
+  // TV clocks are often wrong; refreshed with every server render.
+  const clockOffsetMs = useRef(0);
+  useEffect(() => {
+    clockOffsetMs.current = Date.parse(renderedAt) - Date.now();
+  }, [renderedAt]);
+  const serverNow = () => Date.now() + clockOffsetMs.current;
+
   const celebratedSaleIds = useRef(new Set<string>());
-  // Only sales after the board opened are celebrated; this moves forward as they arrive.
-  // Set on mount, which runs before useLiveSales's effect below can ask to catch up.
+  // Server time of the newest sale seen; only later sales are celebrated. Starts at when the
+  // board opened, set on mount, before useLiveSales's effect below can receive anything.
   const lastSaleAt = useRef(0);
   useEffect(() => {
-    lastSaleAt.current = Date.now();
+    lastSaleAt.current = Date.parse(renderedAt);
+    // Only on mount: later server renders must not move it back.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const celebrate = (supabase: SupabaseClient<Database>, sale: SaleRow) => {
+  const celebrate = (sale: NewSale) => {
     if (celebratedSaleIds.current.has(sale.id)) return;
     celebratedSaleIds.current.add(sale.id);
-    lastSaleAt.current = Math.max(lastSaleAt.current, Date.parse(sale.created_at));
-    const enqueue = (celebration: Celebration | null) => {
-      if (celebration) setQueue((current) => [...current, celebration]);
-    };
-    const agent = agentsById.current.get(sale.agent_id);
-    // Known agent: start straight away. An agent added since the page loaded needs one lookup.
-    if (agent) enqueue({ key: sale.id, amount: sale.amount, agentName: agent.agentName, teamName: agent.teamName, videoUrl: agent.videoUrl });
-    else loadCelebration(supabase, sale).then(enqueue);
+    const recordedAt = Date.parse(sale.createdAt);
+    if (Number.isFinite(recordedAt)) lastSaleAt.current = Math.max(lastSaleAt.current, recordedAt);
+    setQueue((current) => [...current, { key: sale.id, amount: sale.amount, agentName: sale.agentName, teamName: sale.teamName, videoUrl: sale.videoUrl }]);
+  };
+
+  /** Asks the server for sales since `since` (server ms): it reads them with the viewer's session. */
+  const celebrateSalesSince = (since: number) => {
+    const from = Number.isFinite(since) ? since : serverNow() - CATCH_UP_WINDOW_MS;
+    listSalesSince(new Date(from).toISOString())
+      .then((sales) => sales.forEach(celebrate))
+      .catch((error: unknown) => console.warn("[board] Couldn't fetch new sales.", error));
   };
 
   useLiveSales("live-board", {
-    onInsert: celebrate,
-    onResume: async (supabase) => {
-      const since = Math.max(lastSaleAt.current, Date.now() - CATCH_UP_WINDOW_MS);
-      for (const sale of await loadSalesSince(supabase, since)) celebrate(supabase, sale);
+    onInsert: (sale) => {
+      const agent = sale && agentsById.current.get(sale.agent_id);
+      // Usual case: Realtime sent the sale and the agent is known, so it starts straight away.
+      if (sale && agent) {
+        celebrate({ id: sale.id, amount: sale.amount, createdAt: sale.created_at, agentName: agent.agentName, teamName: agent.teamName, videoUrl: agent.videoUrl });
+        return;
+      }
+      // Details withheld, or an agent added since the page loaded: fetch everything since the last sale seen.
+      celebrateSalesSince(lastSaleAt.current);
     },
+    onResume: () => celebrateSalesSince(Math.max(lastSaleAt.current, serverNow() - CATCH_UP_WINDOW_MS)),
   });
 
   const finishCurrent = useCallback(() => setQueue((current) => current.slice(1)), []);
@@ -134,43 +159,4 @@ function BoardButton({ onClick, children }: { onClick: () => void; children: str
 function videoSourcesFor(videoUrl: string, preloaded: ReadonlyMap<string, string>): string[] {
   const local = preloaded.get(videoUrl);
   return local ? [local, videoUrl] : [videoUrl];
-}
-
-/** Sales recorded after `since` (ms), oldest first, so missed ones play in order. */
-async function loadSalesSince(supabase: SupabaseClient<Database>, since: number): Promise<SaleRow[]> {
-  const { data, error } = await supabase
-    .from("sales")
-    .select("*")
-    .gt("created_at", new Date(since).toISOString())
-    .order("created_at")
-    .limit(MAX_CATCH_UP);
-  if (error) {
-    console.error(`[board] Catching up on sales since ${new Date(since).toISOString()}: ${error.message}`);
-    return [];
-  }
-  return data;
-}
-
-async function loadCelebration(
-  supabase: SupabaseClient<Database>,
-  sale: SaleRow,
-): Promise<Celebration | null> {
-  const { data, error } = await supabase
-    .from("agents")
-    .select("name, team:teams(name, celebration_video_path)")
-    .eq("id", sale.agent_id)
-    .maybeSingle();
-  if (error || !data) {
-    console.error(`[board] Loading agent ${sale.agent_id} for sale ${sale.id}: ${error?.message ?? "not found"}`);
-    return null;
-  }
-
-  const videoPath = data.team.celebration_video_path;
-  return {
-    key: sale.id,
-    amount: sale.amount,
-    agentName: data.name,
-    teamName: data.team.name,
-    videoUrl: videoPath ? videoPublicUrl(videoPath) : null,
-  };
 }
