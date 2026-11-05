@@ -1,7 +1,8 @@
 import type { StaticImageData } from "next/image";
 import { ActionForm } from "@/components/action-form";
 import { Field, Input } from "@/components/ui";
-import { Avatar } from "@/features/sales-floor/avatar";
+import { AvatarEditor } from "@/features/teams/avatar-editor";
+import { agentAvatarSrc } from "@/features/teams/avatars";
 import { formatUsd } from "@/lib/money";
 import { createAgent, removeAgent, updateAgentAsAdmin, updateAgentAsCloser } from "./actions";
 
@@ -9,6 +10,7 @@ export type AgentRowData = {
   id: string;
   name: string;
   phone: string | null;
+  avatarPath: string | null;
   target: number | null;
   salesCount: number;
   salesTotal: number;
@@ -43,11 +45,17 @@ function TargetField({ target }: { target?: number | null }) {
   );
 }
 
-/** The agent's board photo (initials when their name matches none) and this month's numbers. */
+/** The agent's board photo, with buttons to change it, and this month's numbers. */
 function AgentSummary({ agent, photo }: { agent: AgentRowData; photo: StaticImageData | undefined }) {
   return (
-    <div className="flex items-center gap-3">
-      <Avatar name={agent.name} src={photo ?? null} size={36} tone="light" />
+    <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
+      <AvatarEditor
+        kind="agent"
+        id={agent.id}
+        name={agent.name}
+        src={agentAvatarSrc(agent.avatarPath, photo)}
+        hasUpload={agent.avatarPath !== null}
+      />
       <p className="text-sm text-slate-500">
         This month: <span className="font-medium text-slate-900">{formatUsd(agent.salesTotal)}</span> from{" "}
         {agent.salesCount} {agent.salesCount === 1 ? "sale" : "sales"}

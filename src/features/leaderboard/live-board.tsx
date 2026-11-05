@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { listSalesSince, type NewSale } from "./actions";
 import { CelebrationStage, type Celebration } from "./celebration-stage";
+import { SoundtrackPlayer } from "@/features/soundtrack/soundtrack-player";
 import { useLiveSales } from "./use-live-sales";
-import { usePreloadedVideos } from "./use-preloaded-videos";
+import { usePreloadedMedia } from "./use-preloaded-media";
 
 // The TV controls fade out once the mouse has been still this long, so they don't sit on the board.
 const CONTROLS_IDLE_MS = 4_000;
@@ -21,20 +22,24 @@ export type CelebrationAgent = { id: string; agentName: string; teamName: string
  * data. Each sale is celebrated once, whether it arrives live or is caught up
  * after a gap. `agents` lets a sale's celebration start the moment it
  * arrives, without a lookup; their teams' videos are downloaded and kept
- * ready to play.
+ * ready to play. The admin's soundtrack loops in the background.
  */
 export function LiveBoard({
   agents,
+  soundtrackUrl,
   renderedAt,
   children,
 }: {
   agents: readonly CelebrationAgent[];
+  /** Background music for the TV pages, or null for none (chosen by an admin). */
+  soundtrackUrl: string | null;
   /** When the server rendered the page (ISO); anchors "since the board opened" to the server's clock. */
   renderedAt: string;
   children: ReactNode;
 }) {
   const videoUrls = [...new Set(agents.flatMap((agent) => (agent.videoUrl ? [agent.videoUrl] : [])))].sort();
-  const preloadedVideos = usePreloadedVideos(videoUrls);
+  // One call for everything the boards play: the hook deletes stored files not in its list.
+  const preloaded = usePreloadedMedia(soundtrackUrl ? [...videoUrls, soundtrackUrl] : videoUrls);
   const [queue, setQueue] = useState<Celebration[]>([]);
   // Browsers only allow video with sound after someone interacts with the page.
   const [soundOn, setSoundOn] = useState(false);
@@ -94,15 +99,25 @@ export function LiveBoard({
   });
 
   const finishCurrent = useCallback(() => setQueue((current) => current.slice(1)), []);
+  const allowSound = useCallback(() => setSoundOn(true), []);
   const current = queue[0];
   const showControls = useRecentActivity(CONTROLS_IDLE_MS);
 
   return (
     <>
       {children}
+      {soundtrackUrl && (
+        <SoundtrackPlayer
+          url={soundtrackUrl}
+          localUrl={preloaded.get(soundtrackUrl)}
+          // Quiet while a celebration video plays; it picks up where it left off.
+          isPlaying={soundOn && !current}
+          onSoundAllowed={allowSound}
+        />
+      )}
       <CelebrationStage
         videoUrls={videoUrls}
-        sourcesFor={(videoUrl) => videoSourcesFor(videoUrl, preloadedVideos)}
+        sourcesFor={(videoUrl) => videoSourcesFor(videoUrl, preloaded)}
         current={current ?? null}
         soundOn={soundOn}
         onDone={finishCurrent}

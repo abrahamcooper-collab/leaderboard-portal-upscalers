@@ -4,6 +4,8 @@ import { CloserAgentRow } from "@/features/agents/agent-forms";
 import { toAgentRows } from "@/features/agents/agent-rows";
 import { getStandings } from "@/features/leaderboard/queries";
 import { RecordSaleForm } from "@/features/sales/sale-forms";
+import { AvatarEditor } from "@/features/teams/avatar-editor";
+import { closerAvatarSrc } from "@/features/teams/avatars";
 import { matchTeamPhotos } from "@/features/teams/roster-photos";
 import { getTeamIdForCloser, listAgentContacts } from "@/features/teams/queries";
 import { requireCloser } from "@/lib/auth";
@@ -36,7 +38,17 @@ export default async function CloserPortalPage() {
 
   return (
     <AppShell user={user} links={CLOSER_LINKS}>
-      <PageHeader title={team?.name ?? "My team"} />
+      <PageHeader title={team?.name ?? "My team"}>
+        {/* Their own photo, as shown on the boards and the race. */}
+        <AvatarEditor
+          kind="closer"
+          id={user.id}
+          name={user.fullName}
+          src={closerAvatarSrc(team?.name ?? "", team?.closerAvatarPath ?? null)}
+          hasUpload={Boolean(team?.closerAvatarPath)}
+          size={48}
+        />
+      </PageHeader>
       <div className="mb-6 grid gap-4 sm:grid-cols-4">
         <Stat label="Rank" value={team ? `#${rank + 1} of ${standings.length}` : "—"} />
         <Stat label={`Sales · ${formatMonth(currentMonth())}`} value={formatUsd(team?.salesTotal ?? 0)} />

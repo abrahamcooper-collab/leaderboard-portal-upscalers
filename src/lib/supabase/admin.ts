@@ -5,9 +5,10 @@ import { serverEnv } from "@/lib/server-env";
 import type { Database } from "./database.types";
 
 /**
- * Client with the secret key — bypasses Row Level Security. Use only for
- * Auth admin operations (creating/deleting logins), and only after the
- * caller has been verified as an admin.
+ * Client with the secret key — bypasses Row Level Security. Use only after
+ * the server has checked the caller may do this exact thing: Auth admin
+ * operations (creating/deleting logins, admins only) and photo uploads
+ * (checked per photo in features/teams/avatar-actions.ts).
  */
 export function createAdminClient() {
   return createClient<Database>(

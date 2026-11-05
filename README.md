@@ -4,7 +4,7 @@ Tracks sales for closers' teams and shows a live leaderboard that plays a
 celebration video whenever an admin records a sale.
 
 - **Admins** manage closers, teams, agents, monthly targets and videos, and record sales.
-- **Closers** see their team's stats, record sales for their own agents, set their agents' monthly targets, and can rename agents or change their phone numbers. Adding or removing agents stays with admins.
+- **Closers** see their team's stats, record sales for their own agents, set their agents' monthly targets, change their own and their agents' photos, and can rename agents or change their phone numbers. Adding or removing agents stays with admins.
 - **The Sales Floor** (`/sales-floor`) is built for a TV. It updates live and celebrates each new sale.
 - **Operations Closeout** (`/operations-closeout`) is the closer race: each closer runs toward their team target, with their photo as the runner's face. A closer with no sales this month stands at the start; anyone with a sale is always running. After a team's sale, its runner moves forward for 10 minutes, covering the new distance in exactly that time, with quicker legs for a bigger sale.
 - **Page 3** (`/page-3`) is one full-screen picture, from `public/images/Page3/`.
@@ -13,6 +13,8 @@ celebration video whenever an admin records a sale.
 - **Celebrations**: every TV page (Sales Floor, Operations Closeout, Page 3, Page 4, Slideshow) shares `src/app/(boards)/layout.tsx`, so a new sale plays its team's video full screen over whichever one is open. Moving between them keeps the live connection and the downloaded videos. Sales missed while the connection was down or the tab was hidden are caught up (last 10 minutes, at most 3). Without a click on **Enable sound**, videos play muted.
 - **Celebration videos must be TV-friendly** to play instantly everywhere: MP4, 1080p, 30 fps, under 8 Mbps, with the index at the start. The upload form checks this and refuses heavier files with export tips. Each team's video stays loaded and paused out of sight on the TV pages, so a sale only has to show it and press play.
 - **Videos are downloaded once per device** and kept in the browser's on-device cache (`src/features/leaderboard/use-preloaded-videos.ts`), so reloads and restarts play them from disk. Storage is only a speed-up: if a device has no cache, refuses to store or is out of space, videos are kept in memory; a failed download retries on its own; and if a stored copy won't play, the video streams instead. A replaced video gets a new address, so devices fetch the new one and delete the old.
+- **Uploaded photos** (Change photo, on a team's admin page and the closer's My team page) are cropped to a square in the browser and override the team photos below. A closer may change their own and their agents' photos; admins anyone's. The server checks this per photo before writing (`src/features/teams/avatar-actions.ts`).
+- **Soundtrack** (Admin → Soundtrack): background music that loops on the TV pages and pauses during celebration videos. It's stored on each device like the videos. Browsers only play sound after a click on **Enable sound**, unless the TV's browser allows it anyway.
 - **Photos** of closers and agents come from `public/images/team*/`, listed in `src/features/teams/roster-photos.ts`. A closer's photo is matched by team. An agent's is matched by name within their team, allowing a first name only ("Henry" → Henry Miller) and small spelling differences ("Shawn" → Sean). A team's admin page shows each agent's photo and lists any photos no agent matched.
 
 Stack: Next.js 16 (App Router, Server Actions), Tailwind CSS v4, Supabase (Postgres, Auth, Realtime, Storage), deployed on Vercel.
@@ -41,6 +43,7 @@ Stack: Next.js 16 (App Router, Server Actions), Tailwind CSS v4, Supabase (Postg
    3. `20261031000000_sales_floor.sql`
    4. `20261031010000_closer_moods.sql`
    5. `20261103000000_closer_targets_and_sales.sql`
+   6. `20261105000000_soundtrack.sql`
 
 ### 2. Create the first admin
 

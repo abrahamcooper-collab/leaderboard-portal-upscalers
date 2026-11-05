@@ -6,6 +6,8 @@ import { AddAgentForm, AdminAgentRow } from "@/features/agents/agent-forms";
 import { toAgentRows } from "@/features/agents/agent-rows";
 import { getStandings } from "@/features/leaderboard/queries";
 import { CloserLoginForm, EditCloserForm, RemoveCloserForm } from "@/features/teams/closer-forms";
+import { AvatarEditor } from "@/features/teams/avatar-editor";
+import { closerAvatarSrc } from "@/features/teams/avatars";
 import { getTeamForAdmin, listAgentContacts } from "@/features/teams/queries";
 import { matchTeamPhotos } from "@/features/teams/roster-photos";
 import { VideoUploader } from "@/features/teams/video-uploader";
@@ -37,6 +39,16 @@ export default async function AdminTeamPage({ params }: PageProps<"/admin/teams/
       </PageHeader>
       <div className="flex flex-col gap-6">
         <Card title="Closer and team">
+          <div className="mb-5">
+            <AvatarEditor
+              kind="closer"
+              id={team.closerId}
+              name={team.closerName}
+              src={closerAvatarSrc(team.name, team.closerAvatarPath)}
+              hasUpload={team.closerAvatarPath !== null}
+              size={48}
+            />
+          </div>
           <EditCloserForm team={team} />
         </Card>
 

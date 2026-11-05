@@ -4,6 +4,7 @@ import { requireAdmin } from "@/lib/auth";
 const ADMIN_LINKS: readonly NavLink[] = [
   { href: "/admin/sales", label: "Sales" },
   { href: "/admin/teams", label: "Teams" },
+  { href: "/admin/soundtrack", label: "Soundtrack" },
   ...BOARD_LINKS,
 ];
 

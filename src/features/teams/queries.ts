@@ -8,6 +8,8 @@ export type TeamSummary = {
   name: string;
   closerName: string;
   closerPhone: string | null;
+  /** The closer's uploaded photo in the avatars bucket; null shows their team photo. */
+  closerAvatarPath: string | null;
   color: TeamColor;
   videoPath: string | null;
 };
@@ -17,13 +19,19 @@ export type TeamDetail = TeamSummary & {
   closerEmail: string | null;
 };
 
-export type AgentContact = { id: string; name: string; phone: string | null };
+export type AgentContact = {
+  id: string;
+  name: string;
+  phone: string | null;
+  /** Their uploaded photo in the avatars bucket; null shows their team photo (or initials). */
+  avatarPath: string | null;
+};
 
 /** What the boards need to celebrate a sale by this agent the instant it arrives. */
 export type AgentWithTeamVideo = { id: string; agentName: string; teamName: string; videoPath: string | null };
 
 const TEAM_COLUMNS =
-  "id, name, color, closer_id, celebration_video_path, closer:profiles!teams_closer_id_fkey(full_name, phone)";
+  "id, name, color, closer_id, celebration_video_path, closer:profiles!teams_closer_id_fkey(full_name, phone, avatar_path)";
 
 export async function listTeams(): Promise<TeamSummary[]> {
   const supabase = await createClient();
@@ -38,6 +46,7 @@ export async function listTeams(): Promise<TeamSummary[]> {
     name: team.name,
     closerName: team.closer.full_name,
     closerPhone: team.closer.phone,
+    closerAvatarPath: team.closer.avatar_path,
     color: toTeamColor(team.color),
     videoPath: team.celebration_video_path,
   }));
@@ -66,6 +75,7 @@ export async function getTeamForAdmin(teamId: string): Promise<TeamDetail | null
     closerId: team.closer_id,
     closerName: team.closer.full_name,
     closerPhone: team.closer.phone,
+    closerAvatarPath: team.closer.avatar_path,
     closerEmail: auth?.user?.email ?? null,
     color: toTeamColor(team.color),
     videoPath: team.celebration_video_path,
@@ -88,12 +98,12 @@ export async function listAgentContacts(teamId: string): Promise<AgentContact[]>
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("agents")
-    .select("id, name, phone")
+    .select("id, name, phone, avatar_path")
     .eq("team_id", teamId)
     .is("archived_at", null)
     .order("name");
   if (error) throw new Error(`Listing agents for team ${teamId} failed: ${error.message}`);
-  return data;
+  return data.map(({ avatar_path, ...agent }) => ({ ...agent, avatarPath: avatar_path }));
 }
 
 /** Every active agent on an active team, with their team's name and celebration video. */

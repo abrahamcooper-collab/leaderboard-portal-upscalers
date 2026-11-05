@@ -109,6 +109,12 @@ export type Database = {
           },
         ];
       };
+      app_settings: {
+        Row: { id: boolean; soundtrack_path: string | null; updated_at: string };
+        Insert: { id?: boolean; soundtrack_path?: string | null; updated_at?: string };
+        Update: { soundtrack_path?: string | null; updated_at?: string };
+        Relationships: [];
+      };
       monthly_targets: {
         Row: { agent_id: string; month: string; amount: number };
         Insert: { agent_id: string; month: string; amount: number };
